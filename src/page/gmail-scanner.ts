@@ -1,41 +1,44 @@
 /**
- * Page-level script — beží v kontexte Gmail stránky (nie content script).
+ * Page-level script — beží v kontexte Gmail stránky.
  * Používa gmail.js na prístup k raw HTML emailov BEZ ich otvorenia.
- * Komunikuje s content scriptom cez window.postMessage.
+ *
+ * METODIKA DETEKCIE:
+ * 1. Fetchujeme raw HTML emailu cez gmail.get.email_data_async (XHR)
+ * 2. Skenujeme HTML na: known domény, URL patterny, 1x1 img, hidden img
+ * 3. Rate limiting: max 1 request/sekunda, max 30 emailov na stránku
+ * 4. Výsledky posielame do content scriptu cez postMessage
  */
-
-// gmail-js vyžaduje jQuery — Gmail stránka ho nemá, ale my ho nabundlujeme
 import jQuery from 'jquery';
 (window as any).$ = jQuery;
 (window as any).jQuery = jQuery;
 
-// Manuálne načítame Gmail konštruktor cez CJS wrapper
 // @ts-ignore
-const gmailModule: any = {};
-// @ts-ignore
-const gmailExports: any = { Gmail: null };
-
-// Dynamický require — funguje v IIFE bundli
+const gmailExports: any = {};
 try {
   const mod = require('gmail-js');
   gmailExports.Gmail = mod.Gmail || mod.default?.Gmail || mod;
 } catch {
-  // Fallback: pokúsime sa nájsť Gmail na window (ak bol načítaný inak)
   gmailExports.Gmail = (window as any).Gmail;
 }
 
 if (!gmailExports.Gmail || typeof gmailExports.Gmail !== 'function') {
-  console.error('[Sledujú Ťa! page] Gmail constructor not found, aborting scanner');
+  console.error('[Sledujú Ťa! page] Gmail constructor not found');
 } else {
   const gmail = new gmailExports.Gmail(jQuery);
   startScanner(gmail);
 }
 
 function startScanner(gmail: any): void {
-  const SCAN_INTERVAL_MS = 3000;
   const scannedIds = new Set<string>();
+  const MAX_SCANS = 30;
+  const RATE_LIMIT_MS = 1000;
+  let scanQueue: string[] = [];
+  let scanning = false;
+  let totalScanned = 0;
 
-  const KNOWN_TRACKER_DOMAINS: Record<string, string> = {
+  // === TRACKER DETECTION ===
+
+  const KNOWN_DOMAINS: Record<string, string> = {
     'list-manage.com': 'Mailchimp', 'mailchimp.com': 'Mailchimp',
     'hubspotemail.net': 'HubSpot', 'track.hubspot.com': 'HubSpot',
     't.sidekickopen.com': 'HubSpot',
@@ -64,7 +67,7 @@ function startScanner(gmail: any): void {
     'linkedin.com': 'LinkedIn',
   };
 
-  const TRACKING_URL_PATTERNS: RegExp[] = [
+  const URL_PATTERNS: RegExp[] = [
     /\/track(ing)?\/open/i, /\/pixel\b/i, /\/beacon\b/i,
     /\/wf\/open/i, /\/e\/o\//i, /\/email\/open/i, /\/emimp\//i,
     /\/o\/[a-f0-9]{16,}/i, /\/open\/[a-f0-9]{8,}/i,
@@ -74,109 +77,143 @@ function startScanner(gmail: any): void {
     /[?&]e=ue&ue_px=/i,
   ];
 
+  // Safe domény — vždy ignorovať
+  const SAFE = ['gstatic.com', 'googleapis.com', 'google.com', 'gmail.com',
+    'ggpht.com', 'ytimg.com', 'gravatar.com', 'githubusercontent.com'];
+
+  function isSafe(url: string): boolean {
+    try {
+      const h = new URL(url).hostname;
+      return SAFE.some(s => h === s || h.endsWith('.' + s));
+    } catch { return false; }
+  }
+
   function findTrackerInHtml(html: string): string | null {
-    for (const [domain, name] of Object.entries(KNOWN_TRACKER_DOMAINS)) {
-      if (html.includes(domain)) return name;
+    if (!html) return null;
+
+    // 1. Known domains v img src
+    const imgSrcRegex = /<img[^>]+src\s*=\s*["']([^"']+)["']/gi;
+    let match;
+    while ((match = imgSrcRegex.exec(html)) !== null) {
+      const src = match[1];
+      if (isSafe(src)) continue;
+
+      // Known domain check
+      try {
+        const hostname = new URL(src).hostname;
+        for (const [domain, name] of Object.entries(KNOWN_DOMAINS)) {
+          if (hostname === domain || hostname.endsWith('.' + domain)) return name;
+        }
+      } catch { /* */ }
+
+      // URL pattern check
+      for (const pattern of URL_PATTERNS) {
+        if (pattern.test(src)) return 'Tracker';
+      }
     }
-    for (const pattern of TRACKING_URL_PATTERNS) {
-      if (pattern.test(html)) return 'Tracker';
+
+    // 2. 1x1 alebo 0x0 obrázky (najspoľahlivejšia heuristika)
+    if (/<img[^>]*\bwidth\s*=\s*["']?[0-3]["'\s][^>]*\bheight\s*=\s*["']?[0-3]["'\s]/i.test(html)) {
+      return 'Tracking pixel';
     }
-    // 1x1 obrázky
-    if (/<img[^>]*(?:width\s*=\s*["']?[01]["'\s>])[^>]*(?:height\s*=\s*["']?[01]["'\s>])/gi.test(html)) return 'Tracking pixel';
-    // display:none obrázky
-    if (/<img[^>]*style\s*=\s*["'][^"']*display\s*:\s*none/i.test(html)) return 'Hidden tracker';
+    if (/<img[^>]*\bheight\s*=\s*["']?[0-3]["'\s][^>]*\bwidth\s*=\s*["']?[0-3]["'\s]/i.test(html)) {
+      return 'Tracking pixel';
+    }
+
+    // 3. display:none img
+    if (/<img[^>]*style\s*=\s*["'][^"']*display\s*:\s*none/i.test(html)) {
+      return 'Hidden tracker';
+    }
+
+    // 4. max-width: 1px img
+    if (/<img[^>]*style\s*=\s*["'][^"']*max-width\s*:\s*1px/i.test(html)) {
+      return 'Hidden tracker';
+    }
+
     return null;
   }
 
-  /**
-   * Skenuje email cez NOVÝ gmail.js API (číta z cache, nerobí XHR).
-   */
-  function scanEmail(emailId: string): void {
-    if (scannedIds.has(emailId)) return;
-    scannedIds.add(emailId);
+  // === RATE-LIMITED SCANNING ===
+
+  function processQueue(): void {
+    if (scanning || scanQueue.length === 0 || totalScanned >= MAX_SCANS) return;
+    scanning = true;
+
+    const emailId = scanQueue.shift()!;
+    totalScanned++;
 
     try {
-      // Nový API — číta z cache, ktorú gmail.js napĺňa z XHR interceptu
-      const emailData = gmail.new.get.email_data(emailId);
-      if (!emailData || !emailData.threads) {
-        // Dáta ešte nie sú v cache — skúsime neskôr
-        scannedIds.delete(emailId);
-        return;
-      }
+      gmail.get.email_data_async(emailId, (emailData: any) => {
+        if (emailData?.threads) {
+          const threadIds = Object.keys(emailData.threads);
+          for (const tid of threadIds) {
+            const thread = emailData.threads[tid];
+            const html = thread?.content_html || '';
+            const fromEmail = thread?.from_email || '';
 
-      for (const threadEntry of emailData.threads) {
-        const html = threadEntry.content_html || '';
-        const fromEmail = threadEntry.from?.address || '';
-
-        if (!html) continue;
-
-        const tracker = findTrackerInHtml(html);
-        if (tracker) {
-          console.log(`[Sledujú Ťa! page] FOUND: ${tracker} from ${fromEmail}`);
-          window.postMessage({
-            type: 'sleduju-ta-scan-result',
-            emailId,
-            tracker,
-            from: fromEmail,
-          }, '*');
-          return; // Stačí nájsť jeden tracker
+            const tracker = findTrackerInHtml(html);
+            if (tracker) {
+              console.log(`[Sledujú Ťa!] FOUND: ${tracker} in ${fromEmail} (${emailId})`);
+              window.postMessage({
+                type: 'sleduju-ta-scan-result',
+                emailId,
+                tracker,
+                from: fromEmail,
+              }, '*');
+              break;
+            }
+          }
         }
-      }
+
+        // Ďalší v queue po rate limit delay
+        setTimeout(() => {
+          scanning = false;
+          processQueue();
+        }, RATE_LIMIT_MS);
+      });
     } catch {
-      // Cache miss alebo iná chyba — skúsime neskôr
-      scannedIds.delete(emailId);
+      scanning = false;
+      setTimeout(processQueue, RATE_LIMIT_MS);
     }
   }
+
+  // === INBOX SCANNING ===
 
   function scanInboxEmails(): void {
     const rows = document.querySelectorAll('tr.zA');
+    let added = 0;
 
     for (const row of rows) {
-      const threadSpan = row.querySelector('[data-thread-id]') as HTMLElement;
-      // Nový formát: "#thread-f:123..." — odstránime #
-      const rawId = threadSpan?.getAttribute('data-thread-id') || '';
-      const threadId = rawId.startsWith('#') ? rawId.substring(1) : rawId;
+      const span = row.querySelector('[data-legacy-thread-id]') as HTMLElement;
+      const threadId = span?.getAttribute('data-legacy-thread-id') || '';
       if (threadId && !scannedIds.has(threadId)) {
-        scanEmail(threadId);
+        scannedIds.add(threadId);
+        scanQueue.push(threadId);
+        added++;
       }
+    }
+
+    if (added > 0) {
+      console.log(`[Sledujú Ťa! page] Queued ${added} emails for scanning (${totalScanned}/${MAX_SCANS} done)`);
+      processQueue();
     }
   }
 
-  function scanOpenEmail(): void {
-    try {
-      const emailId = gmail.get.email_id();
-      if (emailId && !scannedIds.has(emailId)) {
-        scanEmail(emailId);
-      }
-    } catch { /* nie sme v email view */ }
-  }
-
-  let scanCount = 0;
-
-  function observe(): void {
-    try {
-      scanInboxEmails();
-      if (gmail.check.is_inside_email()) {
-        scanOpenEmail();
-      }
-    } catch { /* */ }
-
-    scanCount++;
-    // Prvých 10 skenov rýchlejšie (každé 2s), potom spomalíme na 10s
-    const interval = scanCount < 10 ? 2000 : 10000;
-    setTimeout(observe, interval);
-  }
-
-  // Aktivujeme nový data layer watchers
-  try {
-    gmail.tools.xhr_watcher();
-    gmail.tools.embedded_data_watcher();
-  } catch { /* */ }
+  // === INIT ===
 
   gmail.observe.on('load', () => {
-    console.log('[Sledujú Ťa! page] gmail.js loaded, starting scanner');
+    console.log('[Sledujú Ťa! page] gmail.js loaded, scanning inbox...');
     window.postMessage({ type: 'sleduju-ta-ready' }, '*');
-    // Počkáme 2s aby sa cache naplnila
-    setTimeout(observe, 2000);
+
+    // Počkáme kým sa Gmail DOM načíta
+    setTimeout(() => {
+      scanInboxEmails();
+      // Re-scan pri DOM zmenách (nové emaily, scroll)
+      const observer = new MutationObserver(() => scanInboxEmails());
+      const main = document.querySelector('div[role="main"]');
+      if (main) {
+        observer.observe(main, { childList: true, subtree: true });
+      }
+    }, 3000);
   });
 }
