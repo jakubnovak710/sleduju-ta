@@ -3,462 +3,292 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sledujú Ťa! — Ochrana emailového súkromia</title>
-  <meta name="description" content="Chrome rozšírenie, ktoré blokuje tracking pixely v Gmail mailoch. Zistite kto vás sleduje. Vyrobené na Slovensku.">
-  <meta property="og:title" content="Sledujú Ťa! — Ochrana emailového súkromia">
-  <meta property="og:description" content="Chrome rozšírenie, ktoré blokuje tracking pixely v Gmail mailoch.">
+  <title>Sledujú Ťa! — Zistite kto číta vaše emaily</title>
+  <meta name="description" content="Bezplatné Chrome rozšírenie, ktoré odhalí skryté sledovače vo vašich emailoch. Zistíte kto vás sleduje — ešte pred otvorením správy.">
+  <meta property="og:title" content="Sledujú Ťa! — Zistite kto číta vaše emaily">
+  <meta property="og:description" content="Bezplatné Chrome rozšírenie, ktoré odhalí skryté sledovače vo vašich emailoch.">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://sledujata.online">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    :root {
-      --blue: #1a73e8;
-      --blue-dark: #1557b0;
-      --red: #d93025;
-      --gray-50: #f8f9fa;
-      --gray-100: #f1f3f4;
-      --gray-600: #5f6368;
-      --gray-900: #202124;
-    }
-
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      color: var(--gray-900);
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    .container {
-      max-width: 1080px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{--blue:#1a73e8;--red:#d93025;--dark:#1a1a2e;--gray:#5f6368;--light:#f8f9fa}
+    body{font-family:'Inter',system-ui,sans-serif;color:#202124;line-height:1.6;-webkit-font-smoothing:antialiased}
+    .container{max-width:960px;margin:0 auto;padding:0 24px}
+    a{color:var(--blue);text-decoration:none}
+    a:hover{text-decoration:underline}
 
     /* Hero */
-    .hero {
-      padding: 80px 0 60px;
-      text-align: center;
-      background: linear-gradient(180deg, #e8f0fe 0%, #fff 100%);
-    }
-
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 16px;
-      background: white;
-      border: 1px solid #d2e3fc;
-      border-radius: 20px;
-      font-size: 13px;
-      color: var(--blue);
-      font-weight: 500;
-      margin-bottom: 24px;
-    }
-
-    .hero-badge .dot {
-      width: 8px;
-      height: 8px;
-      background: #34a853;
-      border-radius: 50%;
-    }
-
-    h1 {
-      font-size: clamp(40px, 6vw, 64px);
-      font-weight: 800;
-      line-height: 1.1;
-      letter-spacing: -1.5px;
-      margin-bottom: 20px;
-    }
-
-    h1 .highlight {
-      color: var(--red);
-    }
-
-    .hero-sub {
-      font-size: 20px;
-      color: var(--gray-600);
-      max-width: 560px;
-      margin: 0 auto 36px;
-    }
-
-    .cta-row {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 14px 28px;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: 600;
-      text-decoration: none;
-      transition: transform 0.15s, box-shadow 0.15s;
-    }
-
-    .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-
-    .btn-primary {
-      background: var(--blue);
-      color: white;
-    }
-
-    .btn-secondary {
-      background: white;
-      color: var(--gray-900);
-      border: 1px solid #dadce0;
-    }
-
-    .btn svg { width: 20px; height: 20px; }
-
-    /* Stats */
-    .stats {
-      display: flex;
-      justify-content: center;
-      gap: 48px;
-      padding: 40px 0;
-      text-align: center;
-    }
-
-    .stat-num {
-      font-size: 36px;
-      font-weight: 700;
-      color: var(--blue);
-    }
-
-    .stat-label {
-      font-size: 14px;
-      color: var(--gray-600);
-    }
+    .hero{padding:100px 0 80px;text-align:center;background:linear-gradient(180deg,#fce8e6 0%,#fff 60%)}
+    .hero-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 16px;background:#fff;border:1px solid #f1d0cc;border-radius:20px;font-size:13px;color:var(--red);font-weight:600;margin-bottom:28px}
+    .hero-pill .dot{width:8px;height:8px;background:var(--red);border-radius:50%;animation:pulse 2s infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    h1{font-size:clamp(36px,5.5vw,56px);font-weight:900;line-height:1.08;letter-spacing:-1.5px;margin-bottom:20px}
+    h1 .red{color:var(--red)}
+    .hero p{font-size:19px;color:var(--gray);max-width:520px;margin:0 auto 32px}
+    .cta{display:inline-flex;align-items:center;gap:10px;padding:16px 32px;background:var(--red);color:#fff;border-radius:12px;font-size:17px;font-weight:700;text-decoration:none;transition:transform .15s,box-shadow .15s}
+    .cta:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(217,48,37,.3);text-decoration:none}
+    .cta-secondary{background:#fff;color:var(--dark);border:2px solid #e8eaed;margin-left:12px}
+    .cta-secondary:hover{border-color:var(--dark);box-shadow:0 4px 12px rgba(0,0,0,.08)}
+    .cta-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
 
     /* Problem */
-    .problem {
-      padding: 60px 0;
-      background: var(--gray-50);
-    }
+    .problem{padding:80px 0;background:var(--dark);color:#fff}
+    .problem h2{font-size:32px;font-weight:800;text-align:center;margin-bottom:8px}
+    .problem .sub{text-align:center;color:#9aa0a6;margin-bottom:48px;font-size:17px}
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+    .card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:28px}
+    .card .emoji{font-size:32px;margin-bottom:12px}
+    .card h3{font-size:18px;font-weight:700;margin-bottom:6px}
+    .card p{color:#9aa0a6;font-size:14px;line-height:1.6}
 
-    .problem h2 {
-      font-size: 32px;
-      font-weight: 700;
-      text-align: center;
-      margin-bottom: 12px;
-    }
+    /* How */
+    .how{padding:80px 0}
+    .how h2{font-size:32px;font-weight:800;text-align:center;margin-bottom:48px}
+    .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px;counter-reset:step}
+    .step{text-align:center;counter-increment:step}
+    .step::before{content:counter(step);display:flex;align-items:center;justify-content:center;width:48px;height:48px;background:var(--red);color:#fff;border-radius:50%;font-size:20px;font-weight:800;margin:0 auto 16px}
+    .step h3{font-size:16px;font-weight:700;margin-bottom:6px}
+    .step p{color:var(--gray);font-size:14px}
 
-    .problem-sub {
-      text-align: center;
-      color: var(--gray-600);
-      margin-bottom: 40px;
-      font-size: 17px;
-    }
-
-    .problem-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
-    }
-
-    .problem-card {
-      background: white;
-      border-radius: 12px;
-      padding: 28px;
-      border: 1px solid #e8eaed;
-    }
-
-    .problem-card .icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 16px;
-      background: #fce8e6;
-    }
-
-    .problem-card .icon svg { stroke: var(--red); }
-
-    .problem-card h3 {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-
-    .problem-card p {
-      color: var(--gray-600);
-      font-size: 15px;
-    }
+    /* Comparison */
+    .compare{padding:80px 0;background:var(--light)}
+    .compare h2{font-size:32px;font-weight:800;text-align:center;margin-bottom:12px}
+    .compare .sub{text-align:center;color:var(--gray);margin-bottom:40px}
+    table{width:100%;border-collapse:collapse;font-size:14px;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+    th{background:var(--dark);color:#fff;padding:12px 16px;text-align:left;font-weight:600}
+    td{padding:10px 16px;border-bottom:1px solid #f1f3f4}
+    tr:last-child td{border-bottom:none}
+    .yes{color:#137333;font-weight:600}
+    .no{color:#9aa0a6}
+    .highlight-col{background:#fef7e0}
 
     /* Features */
-    .features {
-      padding: 80px 0;
-    }
+    .features{padding:80px 0}
+    .features h2{font-size:32px;font-weight:800;text-align:center;margin-bottom:48px}
+    .feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+    .feat{padding:24px;border:1px solid #e8eaed;border-radius:12px;transition:border-color .2s}
+    .feat:hover{border-color:var(--red)}
+    .feat .icon{font-size:28px;margin-bottom:12px}
+    .feat h3{font-size:16px;font-weight:700;margin-bottom:4px}
+    .feat p{color:var(--gray);font-size:14px}
 
-    .features h2 {
-      font-size: 32px;
-      font-weight: 700;
-      text-align: center;
-      margin-bottom: 48px;
-    }
+    /* Trust */
+    .trust{padding:60px 0;background:var(--dark);color:#fff;text-align:center}
+    .trust h2{font-size:28px;font-weight:800;margin-bottom:12px}
+    .trust p{color:#9aa0a6;max-width:500px;margin:0 auto 24px}
+    .pills{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:24px}
+    .pill{padding:8px 20px;border-radius:20px;font-size:14px;font-weight:600}
+    .pill-green{background:#0d652d;color:#81c995}
+    .pill-blue{background:#1a3b5c;color:#8ab4f8}
 
-    .feature-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 24px;
-    }
+    /* Footer */
+    .footer{padding:40px 0;text-align:center;border-top:1px solid #e8eaed}
+    .footer-name{font-size:18px;font-weight:700;margin-bottom:4px}
+    .footer-links{display:flex;gap:20px;justify-content:center;margin-top:12px}
+    .footer-links a{font-size:14px;font-weight:500}
+    .footer .made{margin-top:20px;font-size:13px;color:var(--gray)}
 
-    .feature {
-      padding: 24px;
-      border-radius: 12px;
-      border: 1px solid #e8eaed;
-      transition: border-color 0.2s;
-    }
-
-    .feature:hover { border-color: var(--blue); }
-
-    .feature .icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 14px;
-      background: #e8f0fe;
-    }
-
-    .feature .icon svg { stroke: var(--blue); }
-
-    .feature h3 { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
-    .feature p { color: var(--gray-600); font-size: 14px; }
-
-    /* Open Source */
-    .opensource {
-      padding: 60px 0;
-      background: var(--gray-900);
-      color: white;
-      text-align: center;
-    }
-
-    .opensource h2 { font-size: 28px; margin-bottom: 12px; }
-    .opensource p { color: #9aa0a6; max-width: 520px; margin: 0 auto 28px; }
-
-    .license-pills {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-bottom: 28px;
-    }
-
-    .pill {
-      padding: 8px 20px;
-      border-radius: 20px;
-      font-size: 14px;
-      font-weight: 500;
-    }
-
-    .pill-green { background: #0d652d; color: #81c995; }
-    .pill-blue { background: #1a3b5c; color: #8ab4f8; }
-
-    /* Author */
-    .author {
-      padding: 48px 0;
-      text-align: center;
-      border-top: 1px solid #e8eaed;
-    }
-
-    .author-name {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-
-    .author-links {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-      margin-top: 12px;
-    }
-
-    .author-links a {
-      color: var(--blue);
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 500;
-    }
-
-    .author-links a:hover { text-decoration: underline; }
-
-    .flag { font-size: 14px; color: var(--gray-600); margin-top: 20px; }
-
-    /* Responsive */
-    @media (max-width: 640px) {
-      .stats { flex-direction: column; gap: 20px; }
-      .hero { padding: 48px 0 40px; }
-    }
+    @media(max-width:640px){.hero{padding:60px 0 48px}.cta-row{flex-direction:column;align-items:center}.cards,.steps{grid-template-columns:1fr}table{font-size:12px}}
   </style>
 </head>
 <body>
 
-  <!-- Hero -->
-  <section class="hero">
-    <div class="container">
-      <div class="hero-badge">
-        <span class="dot"></span>
-        Open Source
-      </div>
-      <h1>
-        <span class="highlight">Sledujú Ťa!</span><br>
-        My ich zastavíme.
-      </h1>
-      <p class="hero-sub">
-        Chrome rozšírenie, ktoré blokuje tracking pixely v Gmail mailoch a ukáže ti, kto ťa sleduje.
-      </p>
-      <div class="cta-row">
-        <a href="https://chrome.google.com/webstore" class="btn btn-primary">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Pridať do Chrome
-        </a>
-        <a href="https://github.com/jakubnovak710/sleduju-ta" class="btn btn-secondary">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-          GitHub
-        </a>
-      </div>
+<section class="hero">
+  <div class="container">
+    <div class="hero-pill"><span class="dot"></span> Odhaľuje sledovače v reálnom čase</div>
+    <h1>Každý druhý email<br>vás <span class="red">tajne sleduje</span></h1>
+    <p>Bezplatné Chrome rozšírenie, ktoré vám ukáže kto sleduje vaše emaily — a zastaví to.</p>
+    <div class="cta-row">
+      <a href="https://chrome.google.com/webstore" class="cta">Pridať do Chrome — zadarmo</a>
+      <a href="https://github.com/jakubnovak710/sleduju-ta" class="cta cta-secondary">Pozrieť kód</a>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- Stats -->
-  <section class="stats container">
-    <div>
-      <div class="stat-num">200+</div>
-      <div class="stat-label">Známych trackerov</div>
-    </div>
-    <div>
-      <div class="stat-num">5</div>
-      <div class="stat-label">Vrstiev detekcie</div>
-    </div>
-    <div>
-      <div class="stat-num">0</div>
-      <div class="stat-label">Dát odoslaných</div>
-    </div>
-  </section>
-
-  <!-- Problem -->
-  <section class="problem">
-    <div class="container">
-      <h2>Problém</h2>
-      <p class="problem-sub">Každý marketingový email obsahuje neviditeľný tracking pixel. Keď ho otvoríte, odosielateľ vie:</p>
-      <div class="problem-grid">
-        <div class="problem-card">
-          <div class="icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          </div>
-          <h3>Kedy ste mail otvorili</h3>
-          <p>Presný čas, koľkokrát ste ho otvorili, z akého zariadenia.</p>
-        </div>
-        <div class="problem-card">
-          <div class="icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-          </div>
-          <h3>Kde sa nachádzate</h3>
-          <p>Vaša IP adresa prezradí mesto, krajinu, niekedy aj presnejšiu polohu.</p>
-        </div>
-        <div class="problem-card">
-          <div class="icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
-          </div>
-          <h3>Aké zariadenie používate</h3>
-          <p>Typ prehliadača, operačný systém, veľkosť obrazovky.</p>
-        </div>
+<section class="problem">
+  <div class="container">
+    <h2>Viete čo sa deje keď otvoríte newsletter?</h2>
+    <p class="sub">Odosielateľ vloží do mailu neviditeľný obrázok. Keď ho váš prehliadač načíta, odosielateľ sa dozvie:</p>
+    <div class="cards">
+      <div class="card">
+        <div class="emoji">&#128337;</div>
+        <h3>Kedy ste mail otvorili</h3>
+        <p>Presný čas, koľkokrát ste ho otvorili, ako dlho ste ho čítali. Niektoré služby vám pošlú ďalší mail ak ste prvý ignorovali.</p>
+      </div>
+      <div class="card">
+        <div class="emoji">&#128205;</div>
+        <h3>Kde sa nachádzate</h3>
+        <p>Vaša IP adresa prezradí mesto a krajinu. Otvoríte mail na dovolenke? Odosielateľ to vie.</p>
+      </div>
+      <div class="card">
+        <div class="emoji">&#128187;</div>
+        <h3>Aké zariadenie používate</h3>
+        <p>Typ prehliadača, operačný systém, či ste na mobile alebo počítači. Všetko bez vášho vedomia.</p>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- Features -->
-  <section class="features">
-    <div class="container">
-      <h2>Ako vás chránime</h2>
-      <div class="feature-grid">
-        <div class="feature">
-          <div class="icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 .6-.92l7-3.11a1 1 0 0 1 .8 0l7 3.11a1 1 0 0 1 .6.92z"/><path d="m9 12 2 2 4-4"/></svg>
-          </div>
-          <h3>5-vrstvová detekcia</h3>
-          <p>Known list, heuristika, URL patterns, CSS tracking, CNAME uncloaking.</p>
-        </div>
-        <div class="feature">
-          <div class="icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="m2 2 20 20"/></svg>
-          </div>
-          <h3>Inbox indikátor</h3>
-          <p>Vidíte kto vás sleduje ešte pred otvorením mailu.</p>
-        </div>
-        <div class="feature">
-          <div class="icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
-          </div>
-          <h3>Link cleaning</h3>
-          <p>Automaticky odstraňuje UTM, fbclid, gclid a ďalšie tracking parametre.</p>
-        </div>
-        <div class="feature">
-          <div class="icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
-          </div>
-          <h3>Dashboard</h3>
-          <p>Prehľadné štatistiky: koľko trackerov, od koho, za aké obdobie.</p>
-        </div>
-        <div class="feature">
-          <div class="icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          </div>
-          <h3>100% lokálne</h3>
-          <p>Žiadne dáta neopúšťajú váš prehliadač. Žiadny server, žiadne účty.</p>
-        </div>
-        <div class="feature">
-          <div class="icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-          </div>
-          <h3>Open Source</h3>
-          <p>Kód je verejný. Overíte si presne čo rozšírenie robí.</p>
-        </div>
+<section class="how">
+  <div class="container">
+    <h2>Ako vás chránime</h2>
+    <div class="steps">
+      <div class="step">
+        <h3>Prečítame email za vás</h3>
+        <p>Ešte pred otvorením prečítame HTML kód emailu a nájdeme skryté tracking pixely.</p>
+      </div>
+      <div class="step">
+        <h3>Zablokujeme sledovač</h3>
+        <p>Nahradíme tracking pixel prázdnym obrázkom. Odosielateľ sa nedozvie že ste mail otvorili.</p>
+      </div>
+      <div class="step">
+        <h3>Vyčistíme odkazy</h3>
+        <p>Z každého odkazu odstránime sledovacie parametre (UTM, fbclid). Kliknete anonymne.</p>
+      </div>
+      <div class="step">
+        <h3>Ukážeme vám kto sleduje</h3>
+        <p>Priamo v inbox zozname vidíte ktoré maily obsahujú sledovače. Prehľad v dashboarde.</p>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- Open Source -->
-  <section class="opensource">
-    <div class="container">
-      <h2>Transparentnosť je základ dôvery</h2>
-      <p>Celý kód je verejný pod Business Source License. Free pre jednotlivcov a malé firmy.</p>
-      <div class="license-pills">
-        <span class="pill pill-green">Free do 500k EUR obratu</span>
-        <span class="pill pill-blue">Open Source po 3 rokoch</span>
-      </div>
-      <a href="https://github.com/jakubnovak710/sleduju-ta" class="btn btn-primary">Pozrieť kód na GitHub</a>
-    </div>
-  </section>
+<section class="compare">
+  <div class="container">
+    <h2>Prečo práve Sledujú Ťa!</h2>
+    <p class="sub">Porovnanie s existujúcimi rozšíreniami na ochranu emailového súkromia</p>
+    <table>
+      <tr>
+        <th>Funkcia</th>
+        <th class="highlight-col">Sledujú Ťa!</th>
+        <th>PixelBlock</th>
+        <th>Ugly Email</th>
+        <th>Trocker</th>
+      </tr>
+      <tr>
+        <td>Čítanie obsahu emailu</td>
+        <td class="highlight-col yes">Áno</td>
+        <td class="no">Nie</td>
+        <td class="yes">Áno</td>
+        <td class="no">Nie</td>
+      </tr>
+      <tr>
+        <td>Detekcia pred otvorením</td>
+        <td class="highlight-col yes">Áno</td>
+        <td class="no">Nie</td>
+        <td class="yes">Áno</td>
+        <td class="no">Nie</td>
+      </tr>
+      <tr>
+        <td>Blokovanie pixelov</td>
+        <td class="highlight-col yes">Áno</td>
+        <td class="yes">Áno</td>
+        <td class="no">Nie</td>
+        <td class="yes">Áno</td>
+      </tr>
+      <tr>
+        <td>Čistenie tracking odkazov</td>
+        <td class="highlight-col yes">Áno</td>
+        <td class="no">Nie</td>
+        <td class="no">Nie</td>
+        <td class="no">Nie</td>
+      </tr>
+      <tr>
+        <td>CNAME uncloaking</td>
+        <td class="highlight-col yes">Áno</td>
+        <td class="no">Nie</td>
+        <td class="no">Nie</td>
+        <td class="no">Nie</td>
+      </tr>
+      <tr>
+        <td>Štatistický dashboard</td>
+        <td class="highlight-col yes">Áno</td>
+        <td class="no">Nie</td>
+        <td class="no">Nie</td>
+        <td class="no">Nie</td>
+      </tr>
+      <tr>
+        <td>Open Source</td>
+        <td class="highlight-col yes">Áno</td>
+        <td class="no">Nie</td>
+        <td class="yes">Áno</td>
+        <td class="yes">Áno</td>
+      </tr>
+      <tr>
+        <td>Slovenčina</td>
+        <td class="highlight-col yes">Áno</td>
+        <td class="no">Nie</td>
+        <td class="no">Nie</td>
+        <td class="no">Nie</td>
+      </tr>
+    </table>
+  </div>
+</section>
 
-  <!-- Author -->
-  <section class="author">
-    <div class="container">
-      <div class="author-name">Jakub Novák</div>
-      <div style="color: var(--gray-600); font-size: 14px;">Vyrobené na Slovensku</div>
-      <div class="author-links">
-        <a href="https://jakubnovak.dev">jakubnovak.dev</a>
-        <a href="https://www.linkedin.com/in/jakubnovak3/">LinkedIn</a>
-        <a href="https://github.com/jakubnovak710/sleduju-ta">GitHub</a>
+<section class="features">
+  <div class="container">
+    <h2>Všetko čo potrebujete</h2>
+    <div class="feat-grid">
+      <div class="feat">
+        <div class="icon">&#128269;</div>
+        <h3>200+ známych sledovačov</h3>
+        <p>Mailchimp, HubSpot, SendGrid, LinkedIn, Salesforce a ďalšie. Plus heuristická detekcia neznámych.</p>
       </div>
-      <div class="flag">&#127480;&#127472; Slovensko</div>
+      <div class="feat">
+        <div class="icon">&#128274;</div>
+        <h3>100% lokálne</h3>
+        <p>Žiadne dáta neopúšťajú váš prehliadač. Žiadny server, žiadne konto, žiadne predplatné.</p>
+      </div>
+      <div class="feat">
+        <div class="icon">&#129504;</div>
+        <h3>Učí sa s každým mailom</h3>
+        <p>Keď nájde tracker, zapamätá si odosielateľa. Nabudúce ho označí okamžite.</p>
+      </div>
+      <div class="feat">
+        <div class="icon">&#128279;</div>
+        <h3>Čistenie odkazov</h3>
+        <p>Automaticky odstraňuje UTM, fbclid, gclid a 16+ ďalších sledovacích parametrov z každého linku.</p>
+      </div>
+      <div class="feat">
+        <div class="icon">&#128065;&#8205;&#128488;</div>
+        <h3>Transparentný kód</h3>
+        <p>Celý zdrojový kód je verejný na GitHub. Môžete si overiť čo rozšírenie robí.</p>
+      </div>
+      <div class="feat">
+        <div class="icon">&#127480;&#127472;</div>
+        <h3>Vyrobené na Slovensku</h3>
+        <p>Slovenské rozšírenie s plnou podporou slovenčiny a angličtiny.</p>
+      </div>
     </div>
-  </section>
+  </div>
+</section>
+
+<section class="trust">
+  <div class="container">
+    <h2>Transparentnosť je základ dôvery</h2>
+    <p>Celý kód je verejný. Free pre jednotlivcov a malé firmy. Open source po 3 rokoch.</p>
+    <div class="pills">
+      <span class="pill pill-green">Free do 500k EUR obratu</span>
+      <span class="pill pill-blue">Open Source po 3 rokoch</span>
+    </div>
+    <a href="https://github.com/jakubnovak710/sleduju-ta" class="cta" style="background:#fff;color:var(--dark)">Pozrieť kód na GitHub</a>
+  </div>
+</section>
+
+<section class="footer">
+  <div class="container">
+    <div class="footer-name">Jakub Novák</div>
+    <div style="color:var(--gray);font-size:14px">Vyrobil som toto rozšírenie, pretože ma štvalo že ma každý newsletter sleduje bez môjho vedomia.</div>
+    <div class="footer-links">
+      <a href="https://jakubnovak.dev">jakubnovak.dev</a>
+      <a href="https://www.linkedin.com/in/jakubnovak3/">LinkedIn</a>
+      <a href="https://github.com/jakubnovak710/sleduju-ta">GitHub</a>
+    </div>
+    <div class="made">Vyrobené na Slovensku &#127480;&#127472;</div>
+  </div>
+</section>
 
 </body>
 </html>
