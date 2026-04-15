@@ -84,25 +84,31 @@ function addBadgeToRow(row: Element, trackerName: string): void {
     borderRadius: '50%',
     cursor: 'help',
     verticalAlign: 'middle',
+    position: 'relative',
+    zIndex: '100',
   });
 
-  // Skúšame vložiť do rôznych miest v riadku
-  const targets = [
-    row.querySelector('td.apU'),       // checkbox bunka
-    row.querySelector('td.xY'),        // star bunka
-    row.querySelector('td:first-child'), // prvá bunka
-  ];
+  // Nájdeme meno odosielateľa a vložíme badge PRED neho
+  const senderSpan = row.querySelector('span.yP, span.zF, span.bA4, span[email]');
+  if (senderSpan?.parentElement) {
+    senderSpan.parentElement.insertBefore(badge, senderSpan);
+    return;
+  }
 
-  for (const td of targets) {
-    if (td) {
-      // Vložíme ZA existujúci obsah bunky
-      td.appendChild(badge);
+  // Fallback: hľadáme akúkoľvek td a vložíme na začiatok
+  const allTds = row.querySelectorAll('td');
+  for (const td of allTds) {
+    if (td.querySelector('.yW, .yP, .zF, .bA4')) {
+      td.insertBefore(badge, td.firstChild);
       return;
     }
   }
 
-  // Absolútny fallback — pred prvý element v riadku
-  row.insertBefore(badge, row.firstChild);
+  // Posledný fallback
+  const firstTd = row.querySelector('td');
+  if (firstTd) {
+    firstTd.appendChild(badge);
+  }
 }
 
 /**

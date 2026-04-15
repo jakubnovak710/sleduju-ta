@@ -119,8 +119,23 @@ function startScanner(gmail: any): void {
 
   function scanInboxEmails(): void {
     const rows = document.querySelectorAll('tr.zA');
+
+    // Debug: prvý scan — ukážeme čo vidíme
+    if (rows.length > 0 && scannedIds.size === 0) {
+      const first = rows[0] as HTMLElement;
+      const attrs = Array.from(first.attributes).map(a => a.name).join(', ');
+      console.log(`[Sledujú Ťa! page] First row attrs: ${attrs}`);
+      // Skúsime aj iné spôsoby zistenia thread ID
+      const h2 = first.querySelector('h2, [data-thread-id], [data-legacy-thread-id]');
+      console.log(`[Sledujú Ťa! page] Row thread element:`, h2);
+    }
+
     for (const row of rows) {
-      const threadId = row.getAttribute('data-legacy-thread-id') || '';
+      // Skúsime viacero spôsobov ako získať thread ID
+      const threadId = row.getAttribute('data-legacy-thread-id')
+        || row.getAttribute('data-thread-id')
+        || (row.querySelector('[data-legacy-thread-id]') as HTMLElement)?.getAttribute('data-legacy-thread-id')
+        || '';
       if (threadId && !scannedIds.has(threadId)) {
         scanEmail(threadId);
       }
