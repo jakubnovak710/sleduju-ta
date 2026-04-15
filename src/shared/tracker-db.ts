@@ -179,11 +179,11 @@ export const KNOWN_TRACKERS: Record<string, string> = {
   'google-analytics.com': 'Google Analytics',
   'ssl.google-analytics.com': 'Google Analytics',
 
-  // Facebook / Meta
-  'facebook.com/tr': 'Facebook Pixel',
+  // Facebook / Meta (tracking pixel je na facebook.com/tr ale hostname check nestačí)
+  // Detekcia prebieha cez URL pattern
 
-  // LinkedIn
-  'linkedin.com/emimp': 'LinkedIn',
+  // LinkedIn (tracking pixel je na linkedin.com/emimp ale hostname check nestačí)
+  // Detekcia prebieha cez URL pattern + heuristiku
 
   // Twitter/X
   't.co': 'Twitter/X',

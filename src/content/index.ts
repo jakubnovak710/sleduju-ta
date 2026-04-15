@@ -74,23 +74,29 @@ function scanCurrentEmail(): void {
  * Zobrazí banner, notifikuje service worker a zapamätá odosielateľa.
  */
 function notifyAndShow(matches: TrackerMatch[], emailBody: Element): void {
+  // Banner VŽDY zobrazíme — toto nesmie zlyhať
   showBanner(matches, emailBody);
 
-  const meta = getEmailMeta();
+  console.log(`[Sledujú Ťa!] Zablokovaných: ${matches.length} trackerov`, matches.map(m => m.tracker));
 
-  // Zapamätáme odosielateľa pre inbox badge
-  const primaryTracker = matches[0]?.tracker || 'Tracker';
-  rememberTrackerSender(meta.sender, primaryTracker);
+  // Storage a messaging — ak zlyhá, nevadí, banner už je zobrazený
+  try {
+    const meta = getEmailMeta();
+    const primaryTracker = matches[0]?.tracker || 'Tracker';
+    rememberTrackerSender(meta.sender, primaryTracker).catch(() => {});
 
-  chrome.runtime.sendMessage({
-    type: 'tracker-blocked',
-    trackers: matches.map((m) => ({
-      tracker: m.tracker,
-      domain: m.domain,
-      method: m.method,
-    })),
-    ...meta,
-  } satisfies BlockedMessage);
+    chrome.runtime.sendMessage({
+      type: 'tracker-blocked',
+      trackers: matches.map((m) => ({
+        tracker: m.tracker,
+        domain: m.domain,
+        method: m.method,
+      })),
+      ...meta,
+    } satisfies BlockedMessage).catch(() => {});
+  } catch {
+    // Storage/messaging error — banner je už zobrazený, pokračujeme
+  }
 }
 
 /**
@@ -134,8 +140,19 @@ function debouncedInboxScan(): void {
 }
 
 async function init(): Promise<void> {
-  const result = await chrome.storage.local.get('enabled');
-  if (result.enabled === false) return;
+  console.log('[Sledujú Ťa!] Init started');
+
+  // Robustné čítanie storage — ak je quota exceeded, vyčistíme a pokračujeme
+  try {
+    const result = await chrome.storage.local.get('enabled');
+    if (result.enabled === false) return;
+  } catch (e) {
+    console.warn('[Sledujú Ťa!] Storage error, clearing and continuing', e);
+    try {
+      await chrome.storage.local.clear();
+      await chrome.storage.local.set({ enabled: true });
+    } catch { /* */ }
+  }
 
   scanCurrentEmail();
   markInboxRows();
@@ -154,6 +171,8 @@ async function init(): Promise<void> {
     childList: true,
     subtree: true,
   });
+
+  console.log('[Sledujú Ťa!] Init complete, observer running');
 }
 
 init();

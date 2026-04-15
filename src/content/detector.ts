@@ -239,6 +239,9 @@ export function detectTrackers(images: HTMLImageElement[]): TrackerMatch[] {
     // Deproxujeme Gmail proxy URL — získame pôvodnú tracking URL
     const src = deproxyUrl(rawSrc);
 
+    // Diagnostika: logujeme len pri zhode (v produkcii odstrániť)
+    // console.log(`[ST DEBUG] w=${img.getAttribute('width')} h=${img.getAttribute('height')} src=${src.substring(0, 80)}`);
+
     // Preskočíme safe domény
     try {
       if (isSafeDomain(new URL(src).hostname)) continue;

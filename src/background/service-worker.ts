@@ -40,7 +40,15 @@ function aggregateStats(dailyStats: Record<string, DailyStats>, fromKey: string,
  * Spracuje správu o zablokovaných trackeroch z content scriptu.
  */
 async function handleBlockedMessage(msg: BlockedMessage): Promise<void> {
-  const storage = await chrome.storage.local.get(null) as StorageSchema;
+  let storage: StorageSchema;
+  try {
+    storage = await chrome.storage.local.get(null) as StorageSchema;
+  } catch {
+    // Quota exceeded pri čítaní — vyčistíme všetko
+    await chrome.storage.local.clear();
+    await chrome.storage.local.set({ enabled: true });
+    storage = { enabled: true, whitelist: [], showBanner: true, language: 'sk', events: [], dailyStats: {} };
+  }
   const today = todayKey();
 
   // Inicializujeme denné štatistiky ak neexistujú
