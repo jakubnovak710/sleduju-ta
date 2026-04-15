@@ -67,48 +67,10 @@ const BADGE_CLASS = 'sleduju-ta-badge';
  * Pridá vizuálny badge do inbox riadku — priame DOM vkladanie.
  */
 function addBadgeToRow(row: Element, trackerName: string): void {
-  if (row.querySelector(`.${BADGE_CLASS}`)) return;
-
-  const badge = document.createElement('div');
-  badge.className = BADGE_CLASS;
-  badge.title = `Sleduje: ${trackerName}`;
-  badge.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
-  Object.assign(badge.style, {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '20px',
-    height: '20px',
-    minWidth: '20px',
-    backgroundColor: '#d93025',
-    borderRadius: '50%',
-    cursor: 'help',
-    verticalAlign: 'middle',
-    position: 'relative',
-    zIndex: '100',
-  });
-
-  // Nájdeme meno odosielateľa a vložíme badge PRED neho
-  const senderSpan = row.querySelector('span.yP, span.zF, span.bA4, span[email]');
-  if (senderSpan?.parentElement) {
-    senderSpan.parentElement.insertBefore(badge, senderSpan);
-    return;
-  }
-
-  // Fallback: hľadáme akúkoľvek td a vložíme na začiatok
-  const allTds = row.querySelectorAll('td');
-  for (const td of allTds) {
-    if (td.querySelector('.yW, .yP, .zF, .bA4')) {
-      td.insertBefore(badge, td.firstChild);
-      return;
-    }
-  }
-
-  // Posledný fallback
-  const firstTd = row.querySelector('td');
-  if (firstTd) {
-    firstTd.appendChild(badge);
-  }
+  const el = row as HTMLElement;
+  // Červený ľavý border — vždy viditeľný, nič nemôže skryť
+  el.style.borderLeft = '4px solid #d93025';
+  el.title = `Sleduje: ${trackerName}`;
 }
 
 /**
