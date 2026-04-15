@@ -144,34 +144,40 @@ function startScanner(gmail: any): void {
 
     try {
       gmail.get.email_data_async(emailId, (emailData: any) => {
-        if (emailData?.threads) {
-          const threadIds = Object.keys(emailData.threads);
-          for (const tid of threadIds) {
-            const thread = emailData.threads[tid];
-            const html = thread?.content_html || '';
-            const fromEmail = thread?.from_email || '';
+        try {
+          if (emailData?.threads) {
+            const threadIds = Object.keys(emailData.threads);
+            for (const tid of threadIds) {
+              const thread = emailData.threads[tid];
+              const html = thread?.content_html || '';
+              const fromEmail = thread?.from_email || '';
 
-            const tracker = findTrackerInHtml(html);
-            if (tracker) {
-              console.log(`[Sledujú Ťa!] FOUND: ${tracker} in ${fromEmail} (${emailId})`);
-              window.postMessage({
-                type: 'sleduju-ta-scan-result',
-                emailId,
-                tracker,
-                from: fromEmail,
-              }, '*');
-              break;
+              const tracker = findTrackerInHtml(html);
+              if (tracker) {
+                console.log(`[Sledujú Ťa!] FOUND: ${tracker} in ${fromEmail} (${emailId})`);
+                window.postMessage({
+                  type: 'sleduju-ta-scan-result',
+                  emailId,
+                  tracker,
+                  from: fromEmail,
+                }, '*');
+                break;
+              }
             }
           }
+        } catch (e) {
+          // TrustedHTML alebo get_reply_to error — preskočíme tento email
+          // console.warn('[Sledujú Ťa! page] Parse error, skipping', emailId);
         }
 
-        // Ďalší v queue po rate limit delay
+        // Ďalší v queue po rate limit delay — VŽDY pokračujeme
         setTimeout(() => {
           scanning = false;
           processQueue();
         }, RATE_LIMIT_MS);
       });
     } catch {
+      // email_data_async zlyhalo — pokračujeme
       scanning = false;
       setTimeout(processQueue, RATE_LIMIT_MS);
     }
