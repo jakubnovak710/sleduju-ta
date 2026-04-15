@@ -135,6 +135,96 @@ function startScanner(gmail: any): void {
 
   // === RATE-LIMITED SCANNING ===
 
+  /**
+   * Priamy fetch emailu cez Gmail API — obchádza gmail.js jQuery parsing.
+   * Toto eliminuje TrustedHTML CSP chybu.
+   */
+  function fetchEmailDirect(emailId: string): void {
+    // Konštruujeme URL rovnako ako gmail.js
+    const ik = gmail.tracker?.ik || '';
+    const url = window.location.origin + window.location.pathname
+      + `?ui=2&ik=${ik}&view=cv&th=${emailId}&msgs=&mb=0&rt=1&search=inbox`;
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState !== 4) return;
+
+      try {
+        const raw = xhr.responseText || '';
+        // Extrahujeme content_html z JSON response BEZ jQuery parsing
+        // Gmail response obsahuje sériu JSON arrays
+        // content_html je typicky v pozícii [13][6] alebo priamo v texte
+        const tracker = findTrackerInRawResponse(raw);
+
+        if (tracker) {
+          // Nájdeme from_email v response
+          const fromMatch = raw.match(/"([^"]+@[^"]+)"/);
+          const fromEmail = fromMatch ? fromMatch[1] : '';
+          console.log(`[Sledujú Ťa!] FOUND: ${tracker} from ${fromEmail} (${emailId})`);
+          window.postMessage({
+            type: 'sleduju-ta-scan-result',
+            emailId,
+            tracker,
+            from: fromEmail,
+          }, '*');
+        }
+      } catch { /* parse error — skip */ }
+
+      // Ďalší v queue
+      setTimeout(() => {
+        scanning = false;
+        processQueue();
+      }, RATE_LIMIT_MS);
+    };
+    xhr.send();
+  }
+
+  /**
+   * Skenuje surový Gmail response na trackery.
+   * Nepoužíva jQuery — pracuje priamo s textom.
+   */
+  function findTrackerInRawResponse(raw: string): string | null {
+    if (!raw || raw.length < 100) return null;
+
+    // Hľadáme tracking domény priamo v raw texte
+    for (const [domain, name] of Object.entries(KNOWN_DOMAINS)) {
+      if (raw.includes(domain)) {
+        // Overíme že je v img kontexte (nie v texte emailu)
+        const imgCheck = new RegExp(`<img[^>]*[^>]*${domain.replace('.', '\\.')}`, 'i');
+        if (imgCheck.test(raw)) return name;
+        // Alebo v URL kontexte
+        const urlCheck = new RegExp(`(?:src|href|url)\\s*=\\s*["'][^"']*${domain.replace('.', '\\.')}`, 'i');
+        if (urlCheck.test(raw)) return name;
+      }
+    }
+
+    // URL patterny v img src
+    for (const pattern of URL_PATTERNS) {
+      // Overíme že pattern je v img kontexte
+      const imgSrcs = raw.match(/src\s*=\s*["']([^"']{10,})["']/gi) || [];
+      for (const srcAttr of imgSrcs) {
+        if (pattern.test(srcAttr)) return 'Tracker';
+      }
+    }
+
+    // Heuristika: malé obrázky
+    if (/width\s*=\s*["']?[0-3]["'\s].*?height\s*=\s*["']?[0-3]["'\s]/i.test(raw) ||
+        /height\s*=\s*["']?[0-3]["'\s].*?width\s*=\s*["']?[0-3]["'\s]/i.test(raw)) {
+      // Overíme že je to img tag, nie niečo iné
+      if (/<img[^>]*(?:width|height)\s*=\s*["']?[0-3]/i.test(raw)) {
+        return 'Tracking pixel';
+      }
+    }
+
+    // display:none img
+    if (/<img[^>]*style\s*=\s*["'][^"']*display\s*:\s*none/i.test(raw)) {
+      return 'Hidden tracker';
+    }
+
+    return null;
+  }
+
   function processQueue(): void {
     if (scanning || scanQueue.length === 0 || totalScanned >= MAX_SCANS) return;
     scanning = true;
@@ -142,45 +232,8 @@ function startScanner(gmail: any): void {
     const emailId = scanQueue.shift()!;
     totalScanned++;
 
-    try {
-      gmail.get.email_data_async(emailId, (emailData: any) => {
-        try {
-          if (emailData?.threads) {
-            const threadIds = Object.keys(emailData.threads);
-            for (const tid of threadIds) {
-              const thread = emailData.threads[tid];
-              const html = thread?.content_html || '';
-              const fromEmail = thread?.from_email || '';
-
-              const tracker = findTrackerInHtml(html);
-              if (tracker) {
-                console.log(`[Sledujú Ťa!] FOUND: ${tracker} in ${fromEmail} (${emailId})`);
-                window.postMessage({
-                  type: 'sleduju-ta-scan-result',
-                  emailId,
-                  tracker,
-                  from: fromEmail,
-                }, '*');
-                break;
-              }
-            }
-          }
-        } catch (e) {
-          // TrustedHTML alebo get_reply_to error — preskočíme tento email
-          // console.warn('[Sledujú Ťa! page] Parse error, skipping', emailId);
-        }
-
-        // Ďalší v queue po rate limit delay — VŽDY pokračujeme
-        setTimeout(() => {
-          scanning = false;
-          processQueue();
-        }, RATE_LIMIT_MS);
-      });
-    } catch {
-      // email_data_async zlyhalo — pokračujeme
-      scanning = false;
-      setTimeout(processQueue, RATE_LIMIT_MS);
-    }
+    // Priamy fetch — obchádza gmail.js jQuery TrustedHTML problém
+    fetchEmailDirect(emailId);
   }
 
   // === INBOX SCANNING ===
