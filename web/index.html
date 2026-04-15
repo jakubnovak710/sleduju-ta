@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sledujú Ťa! — Ochrana emailového súkromia</title>
+  <meta name="description" content="Chrome rozšírenie, ktoré blokuje tracking pixely v Gmail mailoch. Zistite kto vás sleduje. Vyrobené na Slovensku.">
+  <meta property="og:title" content="Sledujú Ťa! — Ochrana emailového súkromia">
+  <meta property="og:description" content="Chrome rozšírenie, ktoré blokuje tracking pixely v Gmail mailoch.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sledujata.online">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --blue: #1a73e8;
+      --blue-dark: #1557b0;
+      --red: #d93025;
+      --gray-50: #f8f9fa;
+      --gray-100: #f1f3f4;
+      --gray-600: #5f6368;
+      --gray-900: #202124;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--gray-900);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Hero */
+    .hero {
+      padding: 80px 0 60px;
+      text-align: center;
+      background: linear-gradient(180deg, #e8f0fe 0%, #fff 100%);
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 16px;
+      background: white;
+      border: 1px solid #d2e3fc;
+      border-radius: 20px;
+      font-size: 13px;
+      color: var(--blue);
+      font-weight: 500;
+      margin-bottom: 24px;
+    }
+
+    .hero-badge .dot {
+      width: 8px;
+      height: 8px;
+      background: #34a853;
+      border-radius: 50%;
+    }
+
+    h1 {
+      font-size: clamp(40px, 6vw, 64px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -1.5px;
+      margin-bottom: 20px;
+    }
+
+    h1 .highlight {
+      color: var(--red);
+    }
+
+    .hero-sub {
+      font-size: 20px;
+      color: var(--gray-600);
+      max-width: 560px;
+      margin: 0 auto 36px;
+    }
+
+    .cta-row {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+
+    .btn-primary {
+      background: var(--blue);
+      color: white;
+    }
+
+    .btn-secondary {
+      background: white;
+      color: var(--gray-900);
+      border: 1px solid #dadce0;
+    }
+
+    .btn svg { width: 20px; height: 20px; }
+
+    /* Stats */
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 48px;
+      padding: 40px 0;
+      text-align: center;
+    }
+
+    .stat-num {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--blue);
+    }
+
+    .stat-label {
+      font-size: 14px;
+      color: var(--gray-600);
+    }
+
+    /* Problem */
+    .problem {
+      padding: 60px 0;
+      background: var(--gray-50);
+    }
+
+    .problem h2 {
+      font-size: 32px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .problem-sub {
+      text-align: center;
+      color: var(--gray-600);
+      margin-bottom: 40px;
+      font-size: 17px;
+    }
+
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .problem-card {
+      background: white;
+      border-radius: 12px;
+      padding: 28px;
+      border: 1px solid #e8eaed;
+    }
+
+    .problem-card .icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      background: #fce8e6;
+    }
+
+    .problem-card .icon svg { stroke: var(--red); }
+
+    .problem-card h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .problem-card p {
+      color: var(--gray-600);
+      font-size: 15px;
+    }
+
+    /* Features */
+    .features {
+      padding: 80px 0;
+    }
+
+    .features h2 {
+      font-size: 32px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    .feature {
+      padding: 24px;
+      border-radius: 12px;
+      border: 1px solid #e8eaed;
+      transition: border-color 0.2s;
+    }
+
+    .feature:hover { border-color: var(--blue); }
+
+    .feature .icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+      background: #e8f0fe;
+    }
+
+    .feature .icon svg { stroke: var(--blue); }
+
+    .feature h3 { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+    .feature p { color: var(--gray-600); font-size: 14px; }
+
+    /* Open Source */
+    .opensource {
+      padding: 60px 0;
+      background: var(--gray-900);
+      color: white;
+      text-align: center;
+    }
+
+    .opensource h2 { font-size: 28px; margin-bottom: 12px; }
+    .opensource p { color: #9aa0a6; max-width: 520px; margin: 0 auto 28px; }
+
+    .license-pills {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+
+    .pill {
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .pill-green { background: #0d652d; color: #81c995; }
+    .pill-blue { background: #1a3b5c; color: #8ab4f8; }
+
+    /* Author */
+    .author {
+      padding: 48px 0;
+      text-align: center;
+      border-top: 1px solid #e8eaed;
+    }
+
+    .author-name {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .author-links {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 12px;
+    }
+
+    .author-links a {
+      color: var(--blue);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .author-links a:hover { text-decoration: underline; }
+
+    .flag { font-size: 14px; color: var(--gray-600); margin-top: 20px; }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .stats { flex-direction: column; gap: 20px; }
+      .hero { padding: 48px 0 40px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge">
+        <span class="dot"></span>
+        Open Source
+      </div>
+      <h1>
+        <span class="highlight">Sledujú Ťa!</span><br>
+        My ich zastavíme.
+      </h1>
+      <p class="hero-sub">
+        Chrome rozšírenie, ktoré blokuje tracking pixely v Gmail mailoch a ukáže ti, kto ťa sleduje.
+      </p>
+      <div class="cta-row">
+        <a href="https://chrome.google.com/webstore" class="btn btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Pridať do Chrome
+        </a>
+        <a href="https://github.com/jakubnovak710/sleduju-ta" class="btn btn-secondary">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="stats container">
+    <div>
+      <div class="stat-num">200+</div>
+      <div class="stat-label">Známych trackerov</div>
+    </div>
+    <div>
+      <div class="stat-num">5</div>
+      <div class="stat-label">Vrstiev detekcie</div>
+    </div>
+    <div>
+      <div class="stat-num">0</div>
+      <div class="stat-label">Dát odoslaných</div>
+    </div>
+  </section>
+
+  <!-- Problem -->
+  <section class="problem">
+    <div class="container">
+      <h2>Problém</h2>
+      <p class="problem-sub">Každý marketingový email obsahuje neviditeľný tracking pixel. Keď ho otvoríte, odosielateľ vie:</p>
+      <div class="problem-grid">
+        <div class="problem-card">
+          <div class="icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <h3>Kedy ste mail otvorili</h3>
+          <p>Presný čas, koľkokrát ste ho otvorili, z akého zariadenia.</p>
+        </div>
+        <div class="problem-card">
+          <div class="icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <h3>Kde sa nachádzate</h3>
+          <p>Vaša IP adresa prezradí mesto, krajinu, niekedy aj presnejšiu polohu.</p>
+        </div>
+        <div class="problem-card">
+          <div class="icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+          </div>
+          <h3>Aké zariadenie používate</h3>
+          <p>Typ prehliadača, operačný systém, veľkosť obrazovky.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="features">
+    <div class="container">
+      <h2>Ako vás chránime</h2>
+      <div class="feature-grid">
+        <div class="feature">
+          <div class="icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 .6-.92l7-3.11a1 1 0 0 1 .8 0l7 3.11a1 1 0 0 1 .6.92z"/><path d="m9 12 2 2 4-4"/></svg>
+          </div>
+          <h3>5-vrstvová detekcia</h3>
+          <p>Known list, heuristika, URL patterns, CSS tracking, CNAME uncloaking.</p>
+        </div>
+        <div class="feature">
+          <div class="icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="m2 2 20 20"/></svg>
+          </div>
+          <h3>Inbox indikátor</h3>
+          <p>Vidíte kto vás sleduje ešte pred otvorením mailu.</p>
+        </div>
+        <div class="feature">
+          <div class="icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+          </div>
+          <h3>Link cleaning</h3>
+          <p>Automaticky odstraňuje UTM, fbclid, gclid a ďalšie tracking parametre.</p>
+        </div>
+        <div class="feature">
+          <div class="icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+          </div>
+          <h3>Dashboard</h3>
+          <p>Prehľadné štatistiky: koľko trackerov, od koho, za aké obdobie.</p>
+        </div>
+        <div class="feature">
+          <div class="icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h3>100% lokálne</h3>
+          <p>Žiadne dáta neopúšťajú váš prehliadač. Žiadny server, žiadne účty.</p>
+        </div>
+        <div class="feature">
+          <div class="icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          </div>
+          <h3>Open Source</h3>
+          <p>Kód je verejný. Overíte si presne čo rozšírenie robí.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Open Source -->
+  <section class="opensource">
+    <div class="container">
+      <h2>Transparentnosť je základ dôvery</h2>
+      <p>Celý kód je verejný pod Business Source License. Free pre jednotlivcov a malé firmy.</p>
+      <div class="license-pills">
+        <span class="pill pill-green">Free do 500k EUR obratu</span>
+        <span class="pill pill-blue">Open Source po 3 rokoch</span>
+      </div>
+      <a href="https://github.com/jakubnovak710/sleduju-ta" class="btn btn-primary">Pozrieť kód na GitHub</a>
+    </div>
+  </section>
+
+  <!-- Author -->
+  <section class="author">
+    <div class="container">
+      <div class="author-name">Jakub Novák</div>
+      <div style="color: var(--gray-600); font-size: 14px;">Vyrobené na Slovensku</div>
+      <div class="author-links">
+        <a href="https://jakubnovak.dev">jakubnovak.dev</a>
+        <a href="https://www.linkedin.com/in/jakubnovak3/">LinkedIn</a>
+        <a href="https://github.com/jakubnovak710/sleduju-ta">GitHub</a>
+      </div>
+      <div class="flag">&#127480;&#127472; Slovensko</div>
+    </div>
+  </section>
+
+</body>
+</html>

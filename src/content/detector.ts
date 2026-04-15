@@ -210,37 +210,52 @@ export function cleanTrackingLinks(container: Element): number {
 }
 
 /**
+ * Extrahuje pôvodnú URL z Gmail proxy URL.
+ * Gmail proxuje obrázky cez googleusercontent.com a pôvodnú URL
+ * zachováva v hash fragmente: https://ci3.googleusercontent.com/proxy/...#https://original.com/pixel.gif
+ */
+function deproxyUrl(src: string): string {
+  if (src.includes('googleusercontent.com/proxy') || src.includes('googleusercontent.com/meips')) {
+    const hashIdx = src.indexOf('#');
+    if (hashIdx > -1) {
+      const original = src.substring(hashIdx + 1);
+      if (original.startsWith('http')) return original;
+    }
+  }
+  return src;
+}
+
+/**
  * Skenuje zoznam obrázkov a identifikuje tracking pixely.
- * Používa 3-vrstvovú detekciu: known list, heuristika, URL patterns.
+ * Gmail proxuje obrázky — extrahujeme pôvodnú URL z hash fragmentu.
  */
 export function detectTrackers(images: HTMLImageElement[]): TrackerMatch[] {
   const matches: TrackerMatch[] = [];
 
   for (const img of images) {
-    const src = img.src || img.getAttribute('data-src') || '';
-    if (!src || src.startsWith('data:') || src.startsWith('blob:')) continue;
+    const rawSrc = img.src || img.getAttribute('data-src') || '';
+    if (!rawSrc || rawSrc.startsWith('data:') || rawSrc.startsWith('blob:')) continue;
 
-    const isGmailProxy = src.includes('googleusercontent.com');
+    // Deproxujeme Gmail proxy URL — získame pôvodnú tracking URL
+    const src = deproxyUrl(rawSrc);
 
-    // Preskočíme safe domény, ALE nie Gmail proxy (ten proxuje aj trackery)
-    if (!isGmailProxy) {
-      try {
-        if (isSafeDomain(new URL(src).hostname)) continue;
-      } catch { /* */ }
-    }
+    // Preskočíme safe domény
+    try {
+      if (isSafeDomain(new URL(src).hostname)) continue;
+    } catch { /* */ }
 
-    // Vrstva 1: Known tracker domény (nefunguje pre Gmail proxy)
-    if (!isGmailProxy) {
-      const knownTracker = matchKnownTracker(src);
-      if (knownTracker) {
-        matches.push({
-          tracker: knownTracker,
-          domain: new URL(src).hostname,
-          method: 'known',
-          element: img,
-        });
-        continue;
-      }
+    // Vrstva 1: Known tracker domény
+    const knownTracker = matchKnownTracker(src);
+    if (knownTracker) {
+      let domain = '';
+      try { domain = new URL(src).hostname; } catch { /* */ }
+      matches.push({
+        tracker: knownTracker,
+        domain,
+        method: 'known',
+        element: img,
+      });
+      continue;
     }
 
     // Vrstva 2: Heuristická detekcia (1x1, hidden, etc.)
