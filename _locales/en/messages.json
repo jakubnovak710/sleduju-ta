@@ -1,0 +1,69 @@
+{
+  "extensionName": {
+    "message": "Sledujú Ťa!",
+    "description": "Extension name"
+  },
+  "extensionDescription": {
+    "message": "Blocks tracking pixels in emails. Protect your privacy.",
+    "description": "Extension description for Chrome Web Store"
+  },
+  "enabled": {
+    "message": "Enabled",
+    "description": "Extension state"
+  },
+  "disabled": {
+    "message": "Disabled",
+    "description": "Extension state"
+  },
+  "today": {
+    "message": "Today",
+    "description": "Daily stats heading"
+  },
+  "thisWeek": {
+    "message": "This week",
+    "description": "Weekly stats heading"
+  },
+  "thisMonth": {
+    "message": "This month",
+    "description": "Monthly stats heading"
+  },
+  "topTrackers": {
+    "message": "Top trackers",
+    "description": "Tracker list heading"
+  },
+  "trackersBlocked": {
+    "message": "$COUNT$ trackers blocked",
+    "description": "Blocked trackers count",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "inEmails": {
+    "message": "in $COUNT$ emails",
+    "description": "Email count",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "noTrackersYet": {
+    "message": "No trackers blocked yet",
+    "description": "Empty state"
+  },
+  "privacyProtection": {
+    "message": "Email privacy protection",
+    "description": "Extension subtitle"
+  },
+  "bannerText": {
+    "message": "$COUNT$ $LABEL$ ($TRACKERS$)",
+    "description": "Gmail banner text",
+    "placeholders": {
+      "count": { "content": "$1" },
+      "label": { "content": "$2" },
+      "trackers": { "content": "$3" }
+    }
+  }
+}

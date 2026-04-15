@@ -1,0 +1,69 @@
+{
+  "extensionName": {
+    "message": "Sledujú Ťa!",
+    "description": "Názov rozšírenia"
+  },
+  "extensionDescription": {
+    "message": "Blokuje tracking pixely v emailoch. Chráňte si súkromie.",
+    "description": "Popis rozšírenia pre Chrome Web Store"
+  },
+  "enabled": {
+    "message": "Zapnuté",
+    "description": "Stav rozšírenia"
+  },
+  "disabled": {
+    "message": "Vypnuté",
+    "description": "Stav rozšírenia"
+  },
+  "today": {
+    "message": "Dnes",
+    "description": "Nadpis denných štatistík"
+  },
+  "thisWeek": {
+    "message": "Tento týždeň",
+    "description": "Nadpis týždenných štatistík"
+  },
+  "thisMonth": {
+    "message": "Tento mesiac",
+    "description": "Nadpis mesačných štatistík"
+  },
+  "topTrackers": {
+    "message": "Top trackery",
+    "description": "Nadpis zoznamu trackerov"
+  },
+  "trackersBlocked": {
+    "message": "$COUNT$ trackerov zablokovaných",
+    "description": "Počet zablokovaných trackerov",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "inEmails": {
+    "message": "v $COUNT$ mailoch",
+    "description": "Počet mailov",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "noTrackersYet": {
+    "message": "Zatiaľ žiadne trackery zablokované",
+    "description": "Prázdny stav"
+  },
+  "privacyProtection": {
+    "message": "Ochrana emailového súkromia",
+    "description": "Podtitul rozšírenia"
+  },
+  "bannerText": {
+    "message": "$COUNT$ $LABEL$ ($TRACKERS$)",
+    "description": "Text banneru v Gmail",
+    "placeholders": {
+      "count": { "content": "$1" },
+      "label": { "content": "$2" },
+      "trackers": { "content": "$3" }
+    }
+  }
+}
