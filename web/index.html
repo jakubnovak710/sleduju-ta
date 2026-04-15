@@ -13,131 +13,117 @@
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
     :root{
-      --bg:#09090b;--surface:#18181b;--surface2:#27272a;--border:#3f3f46;
-      --text:#fafafa;--text2:#a1a1aa;--text3:#71717a;
-      --red:#ef4444;--red-glow:rgba(239,68,68,.15);
-      --accent:#f97316;
+      --bg:#ffffff;--surface:#f8f8fa;--surface2:#f0f0f3;--border:#e4e4e7;
+      --text:#18181b;--text2:#52525b;--text3:#a1a1aa;
+      --red:#dc2626;--red-soft:rgba(220,38,38,.06);--red-border:rgba(220,38,38,.12);
+      --green:#16a34a;--green-soft:rgba(22,163,74,.06);
     }
     html{scroll-behavior:smooth}
     body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden}
     ::selection{background:var(--red);color:#fff}
 
-    /* Utility */
     .container{max-width:1120px;margin:0 auto;padding:0 32px}
     .mono{font-family:'JetBrains Mono',monospace}
-    .text-2{color:var(--text2)}
-    .text-3{color:var(--text3)}
-
-    /* Grain overlay */
-    body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
-      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      opacity:.03;mix-blend-mode:overlay}
 
     /* Animations */
-    @keyframes fadeUp{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:translateY(0)}}
-    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-    @keyframes glow{0%,100%{opacity:.4}50%{opacity:.8}}
-    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
     @keyframes scan{0%{top:-2px;opacity:0}10%{opacity:1}90%{opacity:1}100%{top:calc(100% - 2px);opacity:0}}
-    .fade-up{animation:fadeUp .8s ease both}
+    @keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+    .fade-up{animation:fadeUp .7s ease both}
     .fade-up-1{animation-delay:.1s}
     .fade-up-2{animation-delay:.2s}
     .fade-up-3{animation-delay:.3s}
     .fade-up-4{animation-delay:.4s}
-    .fade-up-5{animation-delay:.5s}
 
     /* Nav */
-    nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:16px 0;
-      background:rgba(9,9,11,.7);backdrop-filter:blur(20px);border-bottom:1px solid rgba(63,63,70,.3)}
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:14px 0;
+      background:rgba(255,255,255,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
     nav .inner{display:flex;align-items:center;justify-content:space-between}
-    .logo{font-size:18px;font-weight:800;letter-spacing:-.5px}
+    .logo{font-size:18px;font-weight:900;letter-spacing:-.5px;color:var(--text)}
     .logo span{color:var(--red)}
     nav a{color:var(--text2);font-size:14px;text-decoration:none;transition:color .2s}
     nav a:hover{color:var(--text)}
     .nav-links{display:flex;gap:28px;align-items:center}
-    .nav-cta{padding:8px 20px;background:var(--red);color:#fff;border-radius:8px;font-weight:600;font-size:13px;transition:all .2s}
-    .nav-cta:hover{background:#dc2626;color:#fff;transform:translateY(-1px)}
+    .nav-cta{padding:8px 20px;background:var(--text);color:#fff;border-radius:8px;font-weight:600;font-size:13px;transition:all .2s}
+    .nav-cta:hover{background:#000;color:#fff;transform:translateY(-1px)}
 
     /* Hero */
-    .hero{padding:180px 0 120px;text-align:center;position:relative}
-    .hero::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:800px;height:600px;
-      background:radial-gradient(ellipse,rgba(239,68,68,.08) 0%,transparent 70%);pointer-events:none}
+    .hero{padding:160px 0 100px;text-align:center;position:relative}
     .hero-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 20px;
       background:var(--surface);border:1px solid var(--border);border-radius:100px;
       font-size:13px;color:var(--text2);margin-bottom:32px;font-weight:500}
-    .hero-badge .pulse{width:8px;height:8px;background:var(--red);border-radius:50%;animation:glow 2s infinite}
-    h1{font-size:clamp(48px,7vw,88px);font-weight:900;line-height:1;letter-spacing:-3px;margin-bottom:24px}
-    h1 .highlight{background:linear-gradient(135deg,var(--red),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-    .hero-sub{font-size:20px;color:var(--text2);max-width:480px;margin:0 auto 48px;line-height:1.6;font-weight:300}
-    .cta-group{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
-    .btn{display:inline-flex;align-items:center;gap:10px;padding:16px 32px;border-radius:12px;font-size:16px;font-weight:600;text-decoration:none;transition:all .25s;border:none;cursor:pointer}
-    .btn-primary{background:#fff;color:#000}
-    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 48px rgba(255,255,255,.1)}
+    .hero-badge .pulse{width:8px;height:8px;background:var(--red);border-radius:50%;animation:pulse 2s infinite}
+    h1{font-size:clamp(48px,7vw,84px);font-weight:900;line-height:1;letter-spacing:-3px;margin-bottom:24px;color:var(--text)}
+    h1 .highlight{color:var(--red)}
+    .hero-sub{font-size:19px;color:var(--text2);max-width:460px;margin:0 auto 48px;line-height:1.7;font-weight:300}
+    .cta-group{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+    .btn{display:inline-flex;align-items:center;gap:10px;padding:15px 30px;border-radius:12px;font-size:15px;font-weight:600;text-decoration:none;transition:all .25s;border:none;cursor:pointer}
+    .btn-primary{background:var(--text);color:#fff}
+    .btn-primary:hover{background:#000;transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.12)}
     .btn-ghost{background:transparent;color:var(--text);border:1px solid var(--border)}
-    .btn-ghost:hover{border-color:var(--text2);transform:translateY(-2px)}
+    .btn-ghost:hover{border-color:var(--text3);transform:translateY(-2px)}
     .btn svg{width:18px;height:18px}
 
-    /* Stats strip */
-    .stats{padding:80px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+    /* Stats */
+    .stats{padding:72px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--surface)}
     .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:48px;text-align:center}
-    .stat-value{font-size:48px;font-weight:800;letter-spacing:-2px;background:linear-gradient(180deg,var(--text) 40%,var(--text3));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-    .stat-label{font-size:14px;color:var(--text3);margin-top:4px;font-weight:400}
+    .stat-value{font-size:48px;font-weight:900;letter-spacing:-2px;color:var(--text)}
+    .stat-label{font-size:13px;color:var(--text3);margin-top:4px;font-weight:400}
 
-    /* Bento grid */
-    .bento{padding:120px 0}
-    .bento h2{font-size:clamp(32px,4vw,48px);font-weight:800;letter-spacing:-1.5px;text-align:center;margin-bottom:16px}
-    .bento .sub{text-align:center;color:var(--text2);margin-bottom:64px;font-size:17px;font-weight:300}
-    .bento-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-    .bento-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;position:relative;overflow:hidden;transition:border-color .3s}
-    .bento-card:hover{border-color:var(--text3)}
+    /* Bento */
+    .bento{padding:100px 0}
+    .bento h2{font-size:clamp(32px,4vw,48px);font-weight:900;letter-spacing:-1.5px;text-align:center;margin-bottom:14px}
+    .bento .sub{text-align:center;color:var(--text2);margin-bottom:56px;font-size:16px;font-weight:300}
+    .bento-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .bento-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;position:relative;overflow:hidden;transition:all .3s}
+    .bento-card:hover{border-color:var(--text3);box-shadow:0 4px 24px rgba(0,0,0,.04)}
     .bento-card.wide{grid-column:span 2}
     .bento-card.tall{grid-row:span 2;display:flex;flex-direction:column;justify-content:space-between}
-    .bento-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;font-size:20px;background:var(--red-glow);border:1px solid rgba(239,68,68,.2)}
-    .bento-card h3{font-size:18px;font-weight:700;margin-bottom:8px;letter-spacing:-.3px}
+    .bento-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;color:var(--red);background:var(--red-soft);border:1px solid var(--red-border)}
+    .bento-icon svg{width:20px;height:20px;stroke-width:2}
+    .bento-card h3{font-size:17px;font-weight:700;margin-bottom:6px;letter-spacing:-.3px}
     .bento-card p{color:var(--text2);font-size:14px;line-height:1.7}
 
     /* Scan demo */
-    .scan-demo{margin-top:24px;background:var(--bg);border:1px solid var(--border);border-radius:12px;overflow:hidden;position:relative}
+    .scan-demo{margin-top:20px;background:var(--bg);border:1px solid var(--border);border-radius:12px;overflow:hidden;position:relative}
     .scan-line{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent);animation:scan 3s ease-in-out infinite}
-    .scan-row{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid rgba(63,63,70,.3);font-size:13px}
+    .scan-row{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:13px}
     .scan-row:last-child{border-bottom:none}
     .scan-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
     .scan-dot.red{background:var(--red)}
-    .scan-dot.green{background:#22c55e}
+    .scan-dot.green{background:var(--green)}
     .scan-from{color:var(--text2);width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     .scan-tracker{color:var(--red);font-family:'JetBrains Mono',monospace;font-size:11px}
-    .scan-clean{color:#22c55e;font-family:'JetBrains Mono',monospace;font-size:11px}
+    .scan-clean{color:var(--green);font-family:'JetBrains Mono',monospace;font-size:11px}
 
     /* How it works */
-    .how{padding:120px 0;background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
-    .how h2{font-size:clamp(32px,4vw,48px);font-weight:800;letter-spacing:-1.5px;text-align:center;margin-bottom:64px}
+    .how{padding:100px 0;background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+    .how h2{font-size:clamp(32px,4vw,48px);font-weight:900;letter-spacing:-1.5px;text-align:center;margin-bottom:56px}
     .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:32px}
     .step{text-align:center;position:relative}
-    .step-num{font-size:64px;font-weight:900;background:linear-gradient(180deg,var(--border) 0%,transparent 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;margin-bottom:16px}
+    .step-num{font-size:56px;font-weight:900;color:var(--border);line-height:1;margin-bottom:14px}
     .step h3{font-size:15px;font-weight:700;margin-bottom:8px}
     .step p{color:var(--text3);font-size:13px;line-height:1.6}
 
     /* Comparison */
-    .compare{padding:120px 0}
-    .compare h2{font-size:clamp(32px,4vw,48px);font-weight:800;letter-spacing:-1.5px;text-align:center;margin-bottom:16px}
+    .compare{padding:100px 0}
+    .compare h2{font-size:clamp(32px,4vw,48px);font-weight:900;letter-spacing:-1.5px;text-align:center;margin-bottom:14px}
     .compare .sub{text-align:center;color:var(--text2);margin-bottom:48px;font-weight:300}
     .compare-table{width:100%;border-collapse:collapse;font-size:14px}
-    .compare-table th{padding:14px 20px;text-align:left;font-weight:600;border-bottom:1px solid var(--border);color:var(--text3);font-size:12px;text-transform:uppercase;letter-spacing:1px}
-    .compare-table td{padding:14px 20px;border-bottom:1px solid rgba(63,63,70,.3)}
-    .compare-table .us{background:rgba(239,68,68,.04);border-left:2px solid var(--red)}
-    .compare-table .us-head{background:rgba(239,68,68,.08);color:var(--red);font-weight:700;border-left:2px solid var(--red)}
-    .check{color:#22c55e}
+    .compare-table th{padding:14px 20px;text-align:left;font-weight:600;border-bottom:2px solid var(--border);color:var(--text3);font-size:12px;text-transform:uppercase;letter-spacing:1px}
+    .compare-table td{padding:14px 20px;border-bottom:1px solid var(--border)}
+    .compare-table .us{background:var(--red-soft);border-left:2px solid var(--red)}
+    .compare-table .us-head{background:rgba(220,38,38,.08);color:var(--red);font-weight:700;border-left:2px solid var(--red)}
+    .check{color:var(--green)}
     .cross{color:var(--text3)}
 
-    /* CTA section */
-    .final-cta{padding:120px 0;text-align:center;position:relative}
-    .final-cta::before{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:600px;height:400px;
-      background:radial-gradient(ellipse,rgba(239,68,68,.06) 0%,transparent 70%);pointer-events:none}
-    .final-cta h2{font-size:clamp(36px,5vw,56px);font-weight:900;letter-spacing:-2px;margin-bottom:16px}
-    .final-cta p{color:var(--text2);margin-bottom:40px;font-size:17px;font-weight:300}
+    /* Final CTA */
+    .final-cta{padding:100px 0;text-align:center;background:var(--surface);border-top:1px solid var(--border)}
+    .final-cta h2{font-size:clamp(36px,5vw,56px);font-weight:900;letter-spacing:-2px;margin-bottom:14px}
+    .final-cta p{color:var(--text2);margin-bottom:40px;font-size:16px;font-weight:300}
 
     /* Footer */
-    footer{padding:48px 0;border-top:1px solid var(--border)}
+    footer{padding:40px 0;border-top:1px solid var(--border)}
     .footer-inner{display:flex;justify-content:space-between;align-items:center}
     .footer-left{font-size:13px;color:var(--text3)}
     .footer-left a{color:var(--text2);text-decoration:none}
@@ -148,7 +134,7 @@
 
     /* Responsive */
     @media(max-width:768px){
-      .hero{padding:140px 0 80px}
+      .hero{padding:130px 0 72px}
       h1{letter-spacing:-1.5px}
       .bento-grid{grid-template-columns:1fr}
       .bento-card.wide{grid-column:span 1}
@@ -170,12 +156,12 @@
 <!-- Nav -->
 <nav>
   <div class="container inner">
-    <div class="logo">sledujú<span>ťa</span></div>
+    <div class="logo">sleduju<span>ta</span></div>
     <div class="nav-links">
       <a href="#how">Ako to funguje</a>
       <a href="#features">Funkcie</a>
       <a href="https://github.com/jakubnovak710/sleduju-ta">GitHub</a>
-      <a href="https://chrome.google.com/webstore" class="nav-cta">Pridať do Chrome</a>
+      <a href="https://chrome.google.com/webstore" class="nav-cta">Pridat do Chrome</a>
     </div>
   </div>
 </nav>
@@ -183,17 +169,17 @@
 <!-- Hero -->
 <section class="hero">
   <div class="container">
-    <div class="hero-badge fade-up"><span class="pulse"></span> Open source &middot; Zadarmo &middot; Vyrobené na Slovensku</div>
-    <h1 class="fade-up fade-up-1">Každý druhý email<br>vás <span class="highlight">tajne sleduje</span></h1>
-    <p class="hero-sub fade-up fade-up-2">Chrome rozšírenie, ktoré odhalí skryté sledovače vo vašich mailoch a zastaví ich. Ešte pred otvorením správy.</p>
+    <div class="hero-badge fade-up"><span class="pulse"></span> Open source &middot; Zadarmo &middot; Vyrobene na Slovensku</div>
+    <h1 class="fade-up fade-up-1">Kazdy druhy email<br>vas <span class="highlight">tajne sleduje</span></h1>
+    <p class="hero-sub fade-up fade-up-2">Chrome rozsirenie, ktore odhali skryte sledovace vo vasich mailoch a zastavi ich. Este pred otvorenim spravy.</p>
     <div class="cta-group fade-up fade-up-3">
       <a href="https://chrome.google.com/webstore" class="btn btn-primary">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Pridať do Chrome — zadarmo
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Pridat do Chrome — zadarmo
       </a>
       <a href="https://github.com/jakubnovak710/sleduju-ta" class="btn btn-ghost">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-        Pozrieť kód
+        Pozriet kod
       </a>
     </div>
   </div>
@@ -203,8 +189,8 @@
 <section class="stats">
   <div class="container">
     <div class="stats-grid">
-      <div class="fade-up"><div class="stat-value">200+</div><div class="stat-label">Známych sledovačov v databáze</div></div>
-      <div class="fade-up fade-up-1"><div class="stat-value">0</div><div class="stat-label">Dát odoslaných na server</div></div>
+      <div class="fade-up"><div class="stat-value">200+</div><div class="stat-label">Znamych sledovacov v databaze</div></div>
+      <div class="fade-up fade-up-1"><div class="stat-value">0</div><div class="stat-label">Dat odoslanych na server</div></div>
       <div class="fade-up fade-up-2"><div class="stat-value">6</div><div class="stat-label">Vrstiev detekcie</div></div>
     </div>
   </div>
@@ -213,20 +199,22 @@
 <!-- Features bento -->
 <section class="bento" id="features">
   <div class="container">
-    <h2>Kompletná ochrana<br>emailového súkromia</h2>
-    <p class="sub">Najkomplexnejšie open-source rozšírenie pre Gmail na trhu.</p>
+    <h2>Kompletna ochrana<br>emailoveho sukromia</h2>
+    <p class="sub">Najkomplexnejsie open-source rozsirenie pre Gmail na trhu.</p>
 
     <div class="bento-grid">
       <!-- Card 1: Live scan demo -->
       <div class="bento-card wide">
-        <div class="bento-icon">&#128269;</div>
-        <h3>Skenuje pred otvorením</h3>
-        <p>Prečítame HTML kód emailu a nájdeme sledovače ešte pred tým, než správu otvoríte.</p>
+        <div class="bento-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        </div>
+        <h3>Skenuje pred otvorenim</h3>
+        <p>Precitame HTML kod emailu a najdeme sledovace este pred tym, nez spravu otvorite.</p>
         <div class="scan-demo">
           <div class="scan-line"></div>
           <div class="scan-row"><span class="scan-dot red"></span><span class="scan-from">Mailchimp</span><span class="scan-tracker">list-manage.com/track/open</span></div>
           <div class="scan-row"><span class="scan-dot red"></span><span class="scan-from">HubSpot</span><span class="scan-tracker">t.sidekickopen.com/e/o/</span></div>
-          <div class="scan-row"><span class="scan-dot green"></span><span class="scan-from">Mama</span><span class="scan-clean">clean &mdash; bez sledovačov</span></div>
+          <div class="scan-row"><span class="scan-dot green"></span><span class="scan-from">Mama</span><span class="scan-clean">clean &mdash; bez sledovacov</span></div>
           <div class="scan-row"><span class="scan-dot red"></span><span class="scan-from">LinkedIn</span><span class="scan-tracker">linkedin.com/emimp/</span></div>
           <div class="scan-row"><span class="scan-dot red"></span><span class="scan-from">Lidl</span><span class="scan-tracker">click.mail.lidlplus.sk/open.aspx</span></div>
         </div>
@@ -235,32 +223,38 @@
       <!-- Card 2: Privacy -->
       <div class="bento-card tall">
         <div>
-          <div class="bento-icon">&#128274;</div>
-          <h3>100% lokálne</h3>
-          <p>Žiadne dáta neopúšťajú váš prehliadač. Žiadny server. Žiadne konto. Žiadne predplatné. Celý kód je verejný na GitHub.</p>
+          <div class="bento-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <h3>100% lokalne</h3>
+          <p>Ziadne data neopustaju vas prehliadac. Ziadny server. Ziadne konto. Ziadne predplatne. Cely kod je verejny na GitHub.</p>
         </div>
         <div style="margin-top:24px;padding:20px;background:var(--bg);border-radius:12px;border:1px solid var(--border)">
           <div class="mono" style="font-size:12px;color:var(--text3)">data_sent_to_server =</div>
-          <div class="mono" style="font-size:28px;font-weight:700;color:#22c55e;margin-top:4px">null</div>
+          <div class="mono" style="font-size:28px;font-weight:700;color:var(--green);margin-top:4px">null</div>
         </div>
       </div>
 
       <!-- Card 3: Link cleaning -->
       <div class="bento-card">
-        <div class="bento-icon">&#128279;</div>
-        <h3>Čistenie odkazov</h3>
-        <p>Automaticky odstraňuje sledovacie parametre z každého linku v emaile.</p>
+        <div class="bento-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        </div>
+        <h3>Cistenie odkazov</h3>
+        <p>Automaticky odstranuje sledovacie parametre z kazdeho linku v emaile.</p>
         <div style="margin-top:16px;padding:12px;background:var(--bg);border-radius:8px;border:1px solid var(--border);font-size:11px;font-family:'JetBrains Mono',monospace;word-break:break-all">
           <div style="color:var(--red);text-decoration:line-through;opacity:.5">?utm_source=newsletter&fbclid=abc123&gclid=xyz</div>
-          <div style="color:#22c55e;margin-top:6px">odkaz bez sledovacích parametrov &#10003;</div>
+          <div style="color:var(--green);margin-top:6px">odkaz bez sledovacich parametrov &#10003;</div>
         </div>
       </div>
 
       <!-- Card 4: CNAME -->
       <div class="bento-card">
-        <div class="bento-icon">&#128373;</div>
+        <div class="bento-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+        </div>
         <h3>CNAME Uncloaking</h3>
-        <p>Odhalíme aj sledovače skryté za vlastnou doménou firmy pomocou DNS lookupu.</p>
+        <p>Odhalime aj sledovace skryte za vlastnou domenou firmy pomocou DNS lookupu.</p>
         <div style="margin-top:16px;font-family:'JetBrains Mono',monospace;font-size:11px">
           <div style="color:var(--text3)">track.firma.sk</div>
           <div style="color:var(--text3);margin:4px 0">&nbsp;&nbsp;&#8627; CNAME</div>
@@ -270,9 +264,11 @@
 
       <!-- Card 5: Learning -->
       <div class="bento-card wide">
-        <div class="bento-icon">&#129504;</div>
-        <h3>Učí sa s každým mailom</h3>
-        <p>Keď nájde sledovač, zapamätá si odosielateľa. Nabudúce ho označí okamžite — bez nutnosti skenovať znova. Čím viac ho používate, tým je presnejší.</p>
+        <div class="bento-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        </div>
+        <h3>Uci sa s kazdym mailom</h3>
+        <p>Ked najde sledovac, zapamata si odosielatela. Nabuduce ho oznaci okamzite — bez nutnosti skenovat znova. Cim viac ho pouzivate, tym je presnejsi.</p>
       </div>
     </div>
   </div>
@@ -285,23 +281,23 @@
     <div class="steps">
       <div class="step">
         <div class="step-num">01</div>
-        <h3>Prečítame email</h3>
-        <p>Ešte pred otvorením prečítame HTML kód a nájdeme skryté tracking pixely.</p>
+        <h3>Precitame email</h3>
+        <p>Este pred otvorenim precitame HTML kod a najdeme skryte tracking pixely.</p>
       </div>
       <div class="step">
         <div class="step-num">02</div>
-        <h3>Zablokujeme sledovač</h3>
-        <p>Nahradíme pixel prázdnym obrázkom. Odosielateľ sa nedozvie že ste mail otvorili.</p>
+        <h3>Zablokujeme sledovac</h3>
+        <p>Nahradime pixel prazdnym obrazkom. Odosielatel sa nedozvie ze ste mail otvorili.</p>
       </div>
       <div class="step">
         <div class="step-num">03</div>
-        <h3>Vyčistíme odkazy</h3>
-        <p>Odstránime UTM, fbclid a ďalšie parametre. Kliknete anonymne.</p>
+        <h3>Vycistime odkazy</h3>
+        <p>Odstranime UTM, fbclid a dalsie parametre. Kliknete anonymne.</p>
       </div>
       <div class="step">
         <div class="step-num">04</div>
-        <h3>Ukážeme výsledky</h3>
-        <p>V inboxe vidíte ktoré maily sledujú. Dashboard ukáže celkové štatistiky.</p>
+        <h3>Ukazeme vysledky</h3>
+        <p>V inboxe vidite ktore maily sleduju. Dashboard ukaze celkove statistiky.</p>
       </div>
     </div>
   </div>
@@ -310,23 +306,23 @@
 <!-- Comparison -->
 <section class="compare" id="compare">
   <div class="container">
-    <h2>Prečo práve my</h2>
-    <p class="sub text-2">Najkomplexnejšie riešenie spomedzi dostupných alternatív.</p>
+    <h2>Preco prave my</h2>
+    <p class="sub">Najkomplexnejsie riesenie spomedzi dostupnych alternativ.</p>
     <table class="compare-table">
       <tr>
         <th></th>
-        <th class="us-head">Sledujú Ťa!</th>
+        <th class="us-head">Sleduju Ta!</th>
         <th>PixelBlock</th>
         <th>Ugly Email</th>
         <th>Trocker</th>
       </tr>
-      <tr><td>Čítanie obsahu emailu</td><td class="us check">&#10003;</td><td class="cross">&#10005;</td><td class="check">&#10003;</td><td class="cross">&#10005;</td></tr>
-      <tr><td>Detekcia pred otvorením</td><td class="us check">&#10003;</td><td class="cross">&#10005;</td><td class="check">&#10003;</td><td class="cross">&#10005;</td></tr>
+      <tr><td>Citanie obsahu emailu</td><td class="us check">&#10003;</td><td class="cross">&#10005;</td><td class="check">&#10003;</td><td class="cross">&#10005;</td></tr>
+      <tr><td>Detekcia pred otvorenim</td><td class="us check">&#10003;</td><td class="cross">&#10005;</td><td class="check">&#10003;</td><td class="cross">&#10005;</td></tr>
       <tr><td>Blokovanie pixelov</td><td class="us check">&#10003;</td><td class="check">&#10003;</td><td class="cross">&#10005;</td><td class="check">&#10003;</td></tr>
-      <tr><td>Čistenie tracking odkazov</td><td class="us check">&#10003;</td><td class="cross">&#10005;</td><td class="cross">&#10005;</td><td class="cross">&#10005;</td></tr>
+      <tr><td>Cistenie tracking odkazov</td><td class="us check">&#10003;</td><td class="cross">&#10005;</td><td class="cross">&#10005;</td><td class="cross">&#10005;</td></tr>
       <tr><td>CNAME uncloaking</td><td class="us check">&#10003;</td><td class="cross">&#10005;</td><td class="cross">&#10005;</td><td class="cross">&#10005;</td></tr>
-      <tr><td>Dashboard so štatistikami</td><td class="us check">&#10003;</td><td class="cross">&#10005;</td><td class="cross">&#10005;</td><td class="cross">&#10005;</td></tr>
-      <tr><td>Open source kód</td><td class="us check">&#10003;</td><td class="cross">&#10005;</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+      <tr><td>Dashboard so statistikami</td><td class="us check">&#10003;</td><td class="cross">&#10005;</td><td class="cross">&#10005;</td><td class="cross">&#10005;</td></tr>
+      <tr><td>Open source kod</td><td class="us check">&#10003;</td><td class="cross">&#10005;</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
     </table>
   </div>
 </section>
@@ -334,12 +330,12 @@
 <!-- Final CTA -->
 <section class="final-cta">
   <div class="container">
-    <h2>Prestaňte byť sledovaní</h2>
-    <p class="text-2">Nainštalujte si rozšírenie zadarmo. Trvá to 10 sekúnd.</p>
+    <h2>Prestante byt sledovani</h2>
+    <p>Nainstalujte si rozsirenie zadarmo. Trva to 10 sekund.</p>
     <div class="cta-group">
       <a href="https://chrome.google.com/webstore" class="btn btn-primary">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Pridať do Chrome — zadarmo
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Pridat do Chrome — zadarmo
       </a>
     </div>
   </div>
@@ -349,8 +345,9 @@
 <footer>
   <div class="container footer-inner">
     <div class="footer-left">
-      <a href="https://jakubnovak.dev"><strong>Jakub Novák</strong></a> &middot;
-      Vyrobené na Slovensku &#127480;&#127472;
+      <a href="https://jakubnovak.dev"><strong>Jakub Novak</strong></a> &middot;
+      Vyrobene na Slovensku &#127480;&#127472; &middot;
+      <a href="mailto:hello@sledujuta.online">hello@sledujuta.online</a>
     </div>
     <div class="footer-right">
       <a href="https://jakubnovak.dev">Web</a>
