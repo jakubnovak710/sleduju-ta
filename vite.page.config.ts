@@ -6,17 +6,13 @@ import { defineConfig } from 'vite';
  */
 export default defineConfig({
   build: {
-    lib: {
-      entry: 'src/page/gmail-scanner.ts',
-      name: 'GmailScanner',
-      fileName: () => 'gmail-scanner.js',
-      formats: ['iife'],
-    },
     outDir: 'dist',
     emptyOutDir: false,
     rollupOptions: {
+      input: 'src/page/gmail-scanner.ts',
       output: {
-        inlineDynamicImports: true,
+        entryFileNames: 'gmail-scanner.js',
+        format: 'iife',
       },
     },
   },
