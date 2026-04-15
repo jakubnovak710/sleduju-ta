@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sledujú Ťa! — Zistite kto číta vaše emaily</title>
-  <meta name="description" content="Bezplatné Chrome rozšírenie, ktoré odhalí skryté sledovače vo vašich emailoch. Open source. Vyrobené na Slovensku.">
+  <meta name="description" content="Bezplatné Chrome rozšírenie, ktoré odhalí skryté trackery vo vašich emailoch. Open source. Vyrobené na Slovensku.">
   <meta property="og:title" content="Sledujú Ťa!">
   <meta property="og:description" content="Každý druhý email vás tajne sleduje. My to zastavíme.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -197,7 +197,7 @@
     <span>Open source · Zadarmo · Vyrobené na Slovensku</span>
   </div>
   <h1 class="fade-up fade-up-1">Každý druhý email<br>vás <span class="gradient">tajne sleduje</span></h1>
-  <p class="hero-sub fade-up fade-up-2">Chrome rozšírenie, ktoré odhalí skryté sledovače vo vašich mailoch a zastaví ich. Ešte pred otvorením správy.</p>
+  <p class="hero-sub fade-up fade-up-2">Chrome rozšírenie, ktoré odhalí skryté trackery vo vašich mailoch a zastaví ich. Ešte pred otvorením správy.</p>
   <div class="cta-group fade-up fade-up-3">
     <a href="https://chrome.google.com/webstore" class="btn btn-primary">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -214,7 +214,7 @@
 <section class="stats">
   <div class="container">
     <div class="stats-grid">
-      <div class="fade-up"><div class="stat-value">200+</div><div class="stat-label">Známych sledovačov v databáze</div></div>
+      <div class="fade-up"><div class="stat-value">200+</div><div class="stat-label">Známych trackerov v databáze</div></div>
       <div class="fade-up fade-up-1"><div class="stat-value">0</div><div class="stat-label">Dát odoslaných na server</div></div>
       <div class="fade-up fade-up-2"><div class="stat-value">6</div><div class="stat-label">Vrstiev detekcie</div></div>
     </div>
@@ -239,12 +239,12 @@
         </div>
         <span class="mono-label" style="color:var(--red);display:block;margin-bottom:6px">Detekcia</span>
         <h3>Skenuje pred otvorením</h3>
-        <p>Prečítame HTML kód emailu a nájdeme sledovače ešte pred tým, než správu otvoríte.</p>
+        <p>Prečítame HTML kód emailu a nájdeme trackery ešte pred tým, než správu otvoríte.</p>
         <div class="scan-demo">
           <div class="scan-line"></div>
           <div class="scan-row"><span class="scan-dot red"></span><span class="scan-from">Mailchimp</span><span class="scan-tracker">list-manage.com/track/open</span></div>
           <div class="scan-row"><span class="scan-dot red"></span><span class="scan-from">HubSpot</span><span class="scan-tracker">t.sidekickopen.com/e/o/</span></div>
-          <div class="scan-row"><span class="scan-dot green"></span><span class="scan-from">Mama</span><span class="scan-clean">clean — bez sledovačov</span></div>
+          <div class="scan-row"><span class="scan-dot green"></span><span class="scan-from">Mama</span><span class="scan-clean">clean — bez trackerov</span></div>
           <div class="scan-row"><span class="scan-dot red"></span><span class="scan-from">LinkedIn</span><span class="scan-tracker">linkedin.com/emimp/</span></div>
           <div class="scan-row"><span class="scan-dot red"></span><span class="scan-from">Lidl</span><span class="scan-tracker">click.mail.lidlplus.sk/open.aspx</span></div>
         </div>
@@ -275,10 +275,10 @@
         </div>
         <span class="mono-label" style="color:var(--red);display:block;margin-bottom:6px">Čistenie</span>
         <h3>Čistenie odkazov</h3>
-        <p>Automaticky odstraňuje sledovacie parametre z každého linku v emaile.</p>
+        <p>Automaticky odstraňuje tracking parametre z každého linku v emaile.</p>
         <div style="margin-top:14px;padding:10px 12px;background:var(--fill-subtle);border-radius:8px;border:1px solid var(--border-subtle);font-size:10px;font-family:'JetBrains Mono',monospace;word-break:break-all;line-height:1.6">
           <div style="color:var(--red);text-decoration:line-through;opacity:.5">?utm_source=newsletter&fbclid=abc123&gclid=xyz</div>
-          <div style="color:var(--success);margin-top:4px">odkaz bez sledovacích parametrov ✓</div>
+          <div style="color:var(--success);margin-top:4px">odkaz bez tracking parametrov ✓</div>
         </div>
       </div>
 
@@ -290,7 +290,7 @@
         </div>
         <span class="mono-label" style="color:var(--red);display:block;margin-bottom:6px">DNS Lookup</span>
         <h3>CNAME Uncloaking</h3>
-        <p>Odhalíme aj sledovače skryté za vlastnou doménou firmy pomocou DNS lookupu.</p>
+        <p>Odhalíme aj trackery skryté za vlastnou doménou firmy pomocou DNS lookupu.</p>
         <div style="margin-top:14px;font-family:'JetBrains Mono',monospace;font-size:10px;line-height:1.8">
           <div style="color:var(--text-muted)">track.firma.sk</div>
           <div style="color:var(--text-faint)">&nbsp;&nbsp;↳ CNAME</div>
@@ -306,7 +306,7 @@
         </div>
         <span class="mono-label" style="color:var(--red);display:block;margin-bottom:6px">Adaptívne</span>
         <h3>Učí sa s každým mailom</h3>
-        <p>Keď nájde sledovač, zapamätá si odosielateľa. Nabudúce ho označí okamžite — bez nutnosti skenovať znova. Čím viac ho používate, tým je presnejší.</p>
+        <p>Keď nájde tracker, zapamätá si odosielateľa. Nabudúce ho označí okamžite — bez nutnosti skenovať znova. Čím viac ho používate, tým je presnejší.</p>
       </div>
     </div>
   </div>
@@ -329,7 +329,7 @@
       </div>
       <div class="step">
         <div class="step-num">Krok 02</div>
-        <h3>Zablokujeme sledovač</h3>
+        <h3>Zablokujeme tracker</h3>
         <p>Nahradíme pixel prázdnym obrázkom. Odosielateľ sa nedozvie že ste mail otvorili.</p>
       </div>
       <div class="step">
@@ -395,7 +395,7 @@
   <div class="container footer-inner">
     <div class="footer-text">
       <a href="https://jakubnovak.dev">Jakub Novák</a> · Vyrobené na Slovensku 🇸🇰 ·
-      <a href="mailto:hello@sledujuta.online">hello@sledujuta.online</a>
+      <a href="mailto:hello@jakubnovak.dev">hello@jakubnovak.dev</a>
     </div>
     <div class="footer-links">
       <a href="https://jakubnovak.dev">Web</a>
