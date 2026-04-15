@@ -34,22 +34,40 @@ const ALWAYS_TRACKING_DOMAINS: Record<string, string> = {
   // E-commerce
   '@email.lidl.sk': 'Lidl',
   '@mail.lidlplus.sk': 'Lidl',
+  '@news.': 'Newsletter',       // news@mail.lidlplus.sk
   '@email.amazon.com': 'Amazon',
   '@mail.amazon.com': 'Amazon',
   '@email.aliexpress.com': 'AliExpress',
 
+  // Z example mailov
+  '@tripadvisor.com': 'Tripadvisor',
+  '@mp1.tripadvisor.com': 'Tripadvisor',
+  '@drivers-email.bolt.eu': 'Bolt',
+  '@bolt.eu': 'Bolt',
+  '@reply.mazda.eu': 'Mazda',
+  '@mazda.eu': 'Mazda',
+  '@soselectronic.com': 'SOS electronic',
+  '@pricing.dkv-mobility.com': 'DKV Mobility',
+  '@dkv-mobility.com': 'DKV Mobility',
+  '@freshobchod.sk': 'Potraviny FRESH',
+  '@smartshop.sk': 'Smartshop',
+  '@novinky.smartshop.sk': 'Smartshop',
+  '@8888.sk': 'Smartshop',
+  '@websupport.sk': 'Websupport',
+
   // SaaS
+  '@supabase.com': 'Supabase',
   '@email.supabase.com': 'Supabase',
   '@mail.supabase.io': 'Supabase',
   '@email.vercel.com': 'Vercel',
   '@updates.basecamp.com': 'Basecamp',
   '@mail.notion.so': 'Notion',
   '@email.monday.com': 'Monday',
+  '@base44.com': 'Base44',
 
   // Marketing obecne — tieto subdomény takmer vždy trackujú
   '@newsletter.': 'Newsletter',
   '@marketing.': 'Marketing',
-  '@news.': 'Newsletter',
   '@promo.': 'Promo',
   '@offers.': 'Marketing',
   '@campaign.': 'Marketing',
@@ -57,8 +75,17 @@ const ALWAYS_TRACKING_DOMAINS: Record<string, string> = {
   '@email.': 'Marketing',
   '@e.': 'Marketing',
   '@noreply.': 'Automated',
+  '@noreplay.': 'Automated',
+  '@no-reply.': 'Automated',
   '@notify.': 'Notification',
   '@info.': 'Info',
+  '@novinky.': 'Newsletter',
+  '@news.': 'Newsletter',
+  '@daily-report.': 'Report',
+  '@helpdesk.': 'Support',
+  '@signup.': 'Signup',
+  '@reply.': 'Marketing',
+  '@inspiration.': 'Marketing',
 };
 
 const BADGE_CLASS = 'sleduju-ta-badge';
@@ -68,8 +95,9 @@ const BADGE_CLASS = 'sleduju-ta-badge';
  */
 function addBadgeToRow(row: Element, trackerName: string): void {
   const el = row as HTMLElement;
-  // Červený ľavý border — vždy viditeľný, nič nemôže skryť
-  el.style.borderLeft = '4px solid #d93025';
+  // box-shadow namiesto border — neignoruje sa pri border-collapse
+  el.style.boxShadow = 'inset 4px 0 0 #d93025';
+  el.style.setProperty('box-shadow', 'inset 4px 0 0 #d93025', 'important');
   el.title = `Sleduje: ${trackerName}`;
 }
 
