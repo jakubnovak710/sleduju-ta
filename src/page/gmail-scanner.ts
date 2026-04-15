@@ -132,8 +132,10 @@ function startScanner(gmail: any): void {
     const rows = document.querySelectorAll('tr.zA');
 
     for (const row of rows) {
-      const threadSpan = row.querySelector('[data-legacy-thread-id]') as HTMLElement;
-      const threadId = threadSpan?.getAttribute('data-legacy-thread-id') || '';
+      const threadSpan = row.querySelector('[data-thread-id]') as HTMLElement;
+      // Nový formát: "#thread-f:123..." — odstránime #
+      const rawId = threadSpan?.getAttribute('data-thread-id') || '';
+      const threadId = rawId.startsWith('#') ? rawId.substring(1) : rawId;
       if (threadId && !scannedIds.has(threadId)) {
         scanEmail(threadId);
       }
