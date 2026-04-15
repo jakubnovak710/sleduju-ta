@@ -3,13 +3,16 @@
  * Používa gmail.js na prístup k raw HTML emailov BEZ ich otvorenia.
  * Komunikuje s content scriptom cez window.postMessage.
  */
-import Gmail from 'gmail-js';
-import $ from 'jquery';
+import * as GmailModule from 'gmail-js';
+import jQuery from 'jquery';
 
-// @ts-ignore — gmail-js vyžaduje jQuery na window
-window.$ = $;
+// gmail-js vyžaduje jQuery na window
+(window as any).$ = jQuery;
+(window as any).jQuery = jQuery;
 
-const gmail = new Gmail();
+// gmail-js exportuje rôzne formáty — zvládneme oba
+const GmailClass = (GmailModule as any).default || GmailModule;
+const gmail = new GmailClass();
 const SCAN_INTERVAL_MS = 3000;
 const scannedIds = new Set<string>();
 

@@ -61,35 +61,48 @@ const ALWAYS_TRACKING_DOMAINS: Record<string, string> = {
   '@info.': 'Info',
 };
 
-// Injektujeme CSS raz — používame data atribút + ::after pseudo-element
-// Gmail nemôže odstrániť CSS pravidlá ani data atribúty
-function ensureStyles(): void {
-  if (document.getElementById(STYLE_ID)) return;
+const BADGE_CLASS = 'sleduju-ta-badge';
 
-  const style = document.createElement('style');
-  style.id = STYLE_ID;
-  style.textContent = `
-    tr.zA[${TRACKED_ATTR}] td.yX::before {
-      content: '';
-      display: inline-block;
-      width: 18px;
-      height: 18px;
-      background: #d93025;
-      border-radius: 50%;
-      vertical-align: middle;
-      margin-right: 6px;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94'/%3E%3Cpath d='M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19'/%3E%3Cline x1='1' y1='1' x2='23' y2='23'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: 12px;
-      flex-shrink: 0;
+/**
+ * Pridá vizuálny badge do inbox riadku — priame DOM vkladanie.
+ */
+function addBadgeToRow(row: Element, trackerName: string): void {
+  if (row.querySelector(`.${BADGE_CLASS}`)) return;
+
+  const badge = document.createElement('div');
+  badge.className = BADGE_CLASS;
+  badge.title = `Sleduje: ${trackerName}`;
+  badge.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
+  Object.assign(badge.style, {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '20px',
+    height: '20px',
+    minWidth: '20px',
+    backgroundColor: '#d93025',
+    borderRadius: '50%',
+    cursor: 'help',
+    verticalAlign: 'middle',
+  });
+
+  // Skúšame vložiť do rôznych miest v riadku
+  const targets = [
+    row.querySelector('td.apU'),       // checkbox bunka
+    row.querySelector('td.xY'),        // star bunka
+    row.querySelector('td:first-child'), // prvá bunka
+  ];
+
+  for (const td of targets) {
+    if (td) {
+      // Vložíme ZA existujúci obsah bunky
+      td.appendChild(badge);
+      return;
     }
-    tr.zA[${TRACKED_ATTR}] td.yX .yW {
-      display: inline-flex !important;
-      align-items: center !important;
-    }
-  `;
-  document.head.appendChild(style);
+  }
+
+  // Absolútny fallback — pred prvý element v riadku
+  row.insertBefore(badge, row.firstChild);
 }
 
 /**
@@ -173,8 +186,6 @@ export async function markInboxRows(): Promise<void> {
     learnedSenders = result[STORAGE_KEY] || {};
   } catch { /* storage error — pokračujeme s hardcoded */ }
 
-  ensureStyles();
-
   const rows = document.querySelectorAll('tr.zA');
   if (rows.length === 0) return;
 
@@ -190,6 +201,7 @@ export async function markInboxRows(): Promise<void> {
 
     if (trackerName) {
       row.setAttribute(TRACKED_ATTR, trackerName);
+      addBadgeToRow(row, trackerName);
       marked++;
     }
   }
