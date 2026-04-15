@@ -88,54 +88,52 @@ function startScanner(gmail: any): void {
     return null;
   }
 
+  /**
+   * Skenuje email cez NOVÝ gmail.js API (číta z cache, nerobí XHR).
+   */
   function scanEmail(emailId: string): void {
     if (scannedIds.has(emailId)) return;
     scannedIds.add(emailId);
 
     try {
-      gmail.get.email_data_async(emailId, (emailData: any) => {
-        if (!emailData?.threads) return;
+      // Nový API — číta z cache, ktorú gmail.js napĺňa z XHR interceptu
+      const emailData = gmail.new.get.email_data(emailId);
+      if (!emailData || !emailData.threads) {
+        // Dáta ešte nie sú v cache — skúsime neskôr
+        scannedIds.delete(emailId);
+        return;
+      }
 
-        const threadIds = Object.keys(emailData.threads);
-        const lastThread = emailData.threads[threadIds[threadIds.length - 1]];
-        if (!lastThread) return;
+      for (const threadEntry of emailData.threads) {
+        const html = threadEntry.content_html || '';
+        const fromEmail = threadEntry.from?.address || '';
 
-        const html = lastThread.content_html || '';
-        const fromEmail = lastThread.from_email || lastThread.from?.address || '';
+        if (!html) continue;
 
         const tracker = findTrackerInHtml(html);
-
-        window.postMessage({
-          type: 'sleduju-ta-scan-result',
-          emailId,
-          tracker,
-          from: fromEmail,
-        }, '*');
-      });
-    } catch (e) {
-      console.warn('[Sledujú Ťa! page] Scan failed', emailId, e);
+        if (tracker) {
+          console.log(`[Sledujú Ťa! page] FOUND: ${tracker} from ${fromEmail}`);
+          window.postMessage({
+            type: 'sleduju-ta-scan-result',
+            emailId,
+            tracker,
+            from: fromEmail,
+          }, '*');
+          return; // Stačí nájsť jeden tracker
+        }
+      }
+    } catch {
+      // Cache miss alebo iná chyba — skúsime neskôr
+      scannedIds.delete(emailId);
     }
   }
 
   function scanInboxEmails(): void {
     const rows = document.querySelectorAll('tr.zA');
 
-    // Debug: prvý scan — ukážeme čo vidíme
-    if (rows.length > 0 && scannedIds.size === 0) {
-      const first = rows[0] as HTMLElement;
-      const attrs = Array.from(first.attributes).map(a => a.name).join(', ');
-      console.log(`[Sledujú Ťa! page] First row attrs: ${attrs}`);
-      // Skúsime aj iné spôsoby zistenia thread ID
-      const h2 = first.querySelector('h2, [data-thread-id], [data-legacy-thread-id]');
-      console.log(`[Sledujú Ťa! page] Row thread element:`, h2);
-    }
-
     for (const row of rows) {
-      // Skúsime viacero spôsobov ako získať thread ID
-      const threadId = row.getAttribute('data-legacy-thread-id')
-        || row.getAttribute('data-thread-id')
-        || (row.querySelector('[data-legacy-thread-id]') as HTMLElement)?.getAttribute('data-legacy-thread-id')
-        || '';
+      const threadSpan = row.querySelector('[data-legacy-thread-id]') as HTMLElement;
+      const threadId = threadSpan?.getAttribute('data-legacy-thread-id') || '';
       if (threadId && !scannedIds.has(threadId)) {
         scanEmail(threadId);
       }
@@ -151,19 +149,32 @@ function startScanner(gmail: any): void {
     } catch { /* nie sme v email view */ }
   }
 
+  let scanCount = 0;
+
   function observe(): void {
     try {
+      scanInboxEmails();
       if (gmail.check.is_inside_email()) {
         scanOpenEmail();
       }
-      scanInboxEmails();
     } catch { /* */ }
-    setTimeout(observe, SCAN_INTERVAL_MS);
+
+    scanCount++;
+    // Prvých 10 skenov rýchlejšie (každé 2s), potom spomalíme na 10s
+    const interval = scanCount < 10 ? 2000 : 10000;
+    setTimeout(observe, interval);
   }
+
+  // Aktivujeme nový data layer watchers
+  try {
+    gmail.tools.xhr_watcher();
+    gmail.tools.embedded_data_watcher();
+  } catch { /* */ }
 
   gmail.observe.on('load', () => {
     console.log('[Sledujú Ťa! page] gmail.js loaded, starting scanner');
     window.postMessage({ type: 'sleduju-ta-ready' }, '*');
-    observe();
+    // Počkáme 2s aby sa cache naplnila
+    setTimeout(observe, 2000);
   });
 }
