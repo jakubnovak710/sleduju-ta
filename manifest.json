@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "__MSG_extensionName__",
   "description": "__MSG_extensionDescription__",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "default_locale": "sk",
   "icons": {
     "16": "src/assets/icon-16.png",
@@ -23,13 +23,19 @@
   "content_scripts": [
     {
       "matches": ["https://mail.google.com/*"],
-      "js": ["src/content/index.ts"],
-      "run_at": "document_idle"
+      "js": ["src/content/loader.ts", "src/content/index.ts"],
+      "run_at": "document_start"
     }
   ],
   "permissions": ["storage"],
   "host_permissions": [
     "https://mail.google.com/*",
     "https://cloudflare-dns.com/*"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["gmail-scanner.js"],
+      "matches": ["https://mail.google.com/*"]
+    }
   ]
 }

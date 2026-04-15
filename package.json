@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build --config vite.page.config.ts && cp dist/gmail-scanner.js public/gmail-scanner.js && vite build",
+    "build:ext": "vite build",
+    "build:page": "vite build --config vite.page.config.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },
@@ -28,6 +30,8 @@
     "vitest": "^4.1.4"
   },
   "dependencies": {
+    "gmail-js": "^1.1.16",
+    "jquery": "^4.0.0",
     "lucide-preact": "^1.8.0"
   }
 }
