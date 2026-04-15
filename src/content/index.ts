@@ -28,10 +28,23 @@ function getEmailMeta(): { subject: string; sender: string } {
  * Nájde kontajner otvoreného emailu v Gmail DOM.
  */
 function findEmailBody(): Element | null {
-  const bodies = document.querySelectorAll('div.adn div.a3s');
-  if (bodies.length > 0) {
-    return bodies[bodies.length - 1];
+  // Gmail email body selektory — skúšame viacero variantov
+  const selectors = [
+    'div.adn div.a3s',           // Klasický Gmail
+    'div.a3s.aiL',               // Gmail s aiL triedou
+    'div[data-message-id] div.a3s', // S data-message-id
+    'div.ii.gt div.a3s',         // Alternatíva
+    'div.a3s',                   // Najširší selector
+  ];
+
+  for (const sel of selectors) {
+    const bodies = document.querySelectorAll(sel);
+    if (bodies.length > 0) {
+      console.log(`[Sledujú Ťa!] Email body found: ${sel} (${bodies.length})`);
+      return bodies[bodies.length - 1];
+    }
   }
+
   return null;
 }
 
@@ -40,7 +53,8 @@ function findEmailBody(): Element | null {
  */
 function scanCurrentEmail(): void {
   const emailBody = findEmailBody();
-  if (!emailBody || emailBody === currentEmailElement) return;
+  if (!emailBody) return;
+  if (emailBody === currentEmailElement) return;
 
   currentEmailElement = emailBody;
 
